@@ -6,7 +6,6 @@ import os
 
 if __name__ == '__main__':
     datapath = "/home/Signboard/datasets"
-    train_datagen, val_datagen = DataGen(datapath, batch_size=4)
 
     model = xceptionModel((128,128,3))
     optimizer = SGD(lr=0.001, clipnorm=5.0, momentum=0.9, decay=1e-5)
@@ -19,13 +18,14 @@ if __name__ == '__main__':
     ModelCheckpoint("w.h5", monitor='val_loss', verbose=0, save_best_only=True, save_weights_only=True, mode='auto', period=1)]
 
     model.fit_generator(
-        train_datagen, 
+        DataGen(datapath, batch_size=4, phase='train'), 
         steps_per_epoch=256, 
         epochs=1000, 
         use_multiprocessing=True,
         max_queue_size=100,
         workers=4,
-        validation_data=val_datagen,
+        validation_data=DataGen(datapath, batch_size=4, phase='val'),
+        validation_steps=100,
         callbacks=callbacks)
     model.save_weights("w.h5")
     

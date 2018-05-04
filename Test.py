@@ -21,5 +21,5 @@ if __name__ == '__main__':
         Img = np.expand_dims(np.array( Img ),axis=0) / 255.0
 
         res = model.predict(Img)
-        max_ind = np.argmax(res[0]).astype("int32")
-        result.write("{} {}\n".format(f,max_ind+1))
+        max_ind = np.argmax(res[0]).astype("int32") + 1
+        result.write("{} {}\n".format(f,max_ind))

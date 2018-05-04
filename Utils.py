@@ -3,34 +3,38 @@ from PIL import Image
 import pandas as pd
 import os,shutil
 from keras.preprocessing.image import ImageDataGenerator
+import random
 
-def DataGen(datapath, batch_size=32):
-    data_gen_args = dict(
-        rotation_range=20,
-        width_shift_range=0.2,
-        height_shift_range=0.2,
-        horizontal_flip=True,
-        vertical_flip=True,
-        rescale=1/255.0,
-        fill_mode='constant',
-        cval=0,
-        shear_range=0.2,
-        zoom_range=0.2)
+def DataGen(datapath, batch_size=32, phase='train'):
+    assert phase in ['train','val']
+    if phase == 'train':
+        csv_handle = pd.read_csv(os.path.join(datapath, "train_split.txt"), sep=' ', names=['filepath', 'classid'],dtype={"filepath":"str", "classid":"str"})
+    else:
+        csv_handle = pd.read_csv(os.path.join(datapath, "val_split.txt"), sep=' ', names=['filepath', 'classid'],dtype={"filepath":"str", "classid":"str"})
 
-    train_datagen = ImageDataGenerator(**data_gen_args)
-    val_datagen = ImageDataGenerator(**data_gen_args)
+    data_num = len(csv_handle)
 
-    train_datagen = train_datagen.flow_from_directory(
-        os.path.join(datapath, "train"),
-        target_size=(128, 128),
-        batch_size=batch_size,
-        class_mode='sparse')
-    val_datagen = val_datagen.flow_from_directory(
-        os.path.join(datapath, "val"),
-        target_size=(128, 128),
-        batch_size=batch_size,
-        class_mode='sparse')
-    return train_datagen, val_datagen
+    while True:
+        x = []
+        y = []
+        ind = np.random.choice(data_num, batch_size, replace=False)
+        choiced_data = csv_handle.iloc[ind,:]
+        for row in choiced_data.iterrows():
+            r = row[1]
+            Img = Image.open(os.path.join(datapath, phase, r['classid'], r['filepath'])).resize((128,128),Image.ANTIALIAS)
+
+            aug =  random.randint(0,2)
+            # 水平翻转
+            if aug == 1:
+                Img = Img.transpose(Image.FLIP_LEFT_RIGHT)
+            elif aug == 2:
+                Img = Img.transpose(Image.FLIP_TOP_BOTTOM)
+            x.append(np.array(Img))
+            y.append(int(r['classid'])-1)
+
+        x = np.array(x) / 255.0
+        y = np.array(y)
+        yield x, y
 
 def moveImg(datapath):
     from sklearn.model_selection import train_test_split
