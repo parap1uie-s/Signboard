@@ -13,34 +13,34 @@ def ResNet(input_shape,architecture='resnet50'):
     x = BatchNorm(axis=3, name='bn_conv1')(x)
     x = KL.Activation('relu')(x)
     x = KL.MaxPooling2D((3, 3), strides=(2, 2), padding="same")(x)
+    x = STN_block(x,1)
     # Stage 2
     x = conv_block(x, 3, [64, 64, 256], stage=2, block='a', strides=(1, 1))
     x = identity_block(x, 3, [64, 64, 256], stage=2, block='b')
     x = identity_block(x, 3, [64, 64, 256], stage=2, block='c')
+    x = STN_block(x,2)
     # Stage 3
     x = conv_block(x, 3, [128, 128, 512], stage=3, block='a')
     x = identity_block(x, 3, [128, 128, 512], stage=3, block='b')
     x = identity_block(x, 3, [128, 128, 512], stage=3, block='c')
     x = identity_block(x, 3, [128, 128, 512], stage=3, block='d')
     # STN
-    STN_localization = KL.Flatten()(x)
-    STN_localization = KL.Dense(32, activation='relu', name='STN_loc_1')(STN_localization)
-    STN_localization = KL.Dropout(0.3, name='STN_loc_dropout')(STN_localization)
-    STN_localization = KL.Dense(6, activation='linear', name='STN_loc_2')(STN_localization)
-    x = SpatialTransformLayer(K.int_shape(x),STN_localization)(x)
+    x = STN_block(x,3)
     # Stage 4
     x = conv_block(x, 3, [256, 256, 1024], stage=4, block='a')
     block_count = {"resnet50": 5, "resnet101": 22}[architecture]
     for i in range(block_count):
         x = identity_block(x, 3, [256, 256, 1024], stage=4, block=chr(98 + i))
+    x = STN_block(x,4)
     # Stage 5
-    x = conv_block(x, 3, [256, 256, 256], stage=5, block='a', dilated=2, strides=(1, 1))
-    x = identity_block(x, 3, [256, 256, 256], stage=5, block='b', dilated=2)
-    x = identity_block(x, 3, [256, 256, 256], stage=5, block='c', dilated=2)
+    x = conv_block(x, 3, [256, 256, 256], stage=5, block='a', dilated=1, strides=(1, 1))
+    x = identity_block(x, 3, [256, 256, 256], stage=5, block='b', dilated=1)
+    x = identity_block(x, 3, [256, 256, 256], stage=5, block='c', dilated=1)
+    x = STN_block(x,5)
     # Stage 6
-    x = conv_block(x, 3, [256, 256, 256], stage=6, block='a', dilated=2, strides=(1, 1))
-    x = identity_block(x, 3, [256, 256, 256], stage=6, block='b', dilated=2)
-    x = identity_block(x, 3, [256, 256, 256], stage=6, block='c', dilated=2)
+    x = conv_block(x, 3, [256, 256, 256], stage=6, block='a', dilated=1, strides=(1, 1))
+    x = identity_block(x, 3, [256, 256, 256], stage=6, block='b', dilated=1)
+    x = identity_block(x, 3, [256, 256, 256], stage=6, block='c', dilated=1)
 
     # Final
     x = KL.GlobalAveragePooling2D()(x)
@@ -143,4 +143,18 @@ class BatchNorm(KL.BatchNormalization):
     """
 
     def call(self, inputs, training=None):
-        return super(self.__class__, self).call(inputs, training=False)
+        return super(self.__class__, self).call(inputs, training=True)
+
+def STN_block(input_tensor, stage):
+    x = KL.Conv2D(256, (3,3), activation='relu', name=str(stage)+"_Conv")(input_tensor)
+    x = KL.GlobalAveragePooling2D(name=str(stage)+"_GAvg")(x)
+    x = KL.Dense(64, activation='relu', name=str(stage)+"_STN_1" )(x)
+    x = KL.Dropout(0.3, name=str(stage)+"_DP_1")(x)
+    x = KL.Dense(32, activation='relu', name=str(stage)+"_STN_2" )(x)
+    x = KL.Dropout(0.3,name=str(stage)+"_DP_2")(x)
+    STN_localization = KL.Dense(6, activation='linear', name=str(stage)+"_STN_3", kernel_initializer="zeros", bias_initializer=bias_init )(x)
+
+    return SpatialTransformLayer(K.int_shape(input_tensor),STN_localization)(input_tensor)
+
+def bias_init(shape, dtype=None):
+    return K.variable([1,0,0,0,1,0], dtype=dtype)

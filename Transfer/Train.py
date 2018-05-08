@@ -13,8 +13,10 @@ if __name__ == '__main__':
 
     if os.path.exists("w.h5"):
         model.load_weights("w.h5", by_name=True, skip_mismatch=True)
+    else:
+        model.load_weights("/home/professorsfx/.keras/models/resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5", by_name=True, skip_mismatch=True)
 
-    callbacks = [EarlyStopping(monitor='val_loss', min_delta=0.01, patience=10, verbose=0, mode='auto'), 
+    callbacks = [EarlyStopping(monitor='val_loss', min_delta=0.01, patience=50, verbose=0, mode='auto'), 
     ModelCheckpoint("w.h5", monitor='val_loss', verbose=0, save_best_only=True, save_weights_only=True, mode='auto', period=1)]
 
     model.fit_generator(
@@ -24,7 +26,7 @@ if __name__ == '__main__':
         use_multiprocessing=True,
         max_queue_size=100,
         workers=4,
-        validation_data=DataGen(datapath, shape, batch_size=4, phase='val'),
+        validation_data=DataGen(datapath, shape, batch_size=32, phase='val'),
         validation_steps=100,
         callbacks=callbacks)
     model.save_weights("w.h5")
