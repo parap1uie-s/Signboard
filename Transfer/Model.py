@@ -24,7 +24,6 @@ def ResNet(input_shape,architecture='resnet50'):
     x = identity_block(x, 3, [128, 128, 512], stage=3, block='b')
     x = identity_block(x, 3, [128, 128, 512], stage=3, block='c')
     x = identity_block(x, 3, [128, 128, 512], stage=3, block='d')
-    # STN
     x = STN_block(x,3)
     # Stage 4
     x = conv_block(x, 3, [256, 256, 1024], stage=4, block='a')

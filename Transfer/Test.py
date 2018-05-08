@@ -2,13 +2,13 @@ import pandas as pd
 from PIL import Image
 import numpy as np
 import os
-from Model import xceptionModel
+from Model import *
 
 if __name__ == '__main__':
     datapath = "/home/Signboard/datasets"
     test_pd = pd.read_csv(os.path.join(datapath, "test.txt"), sep=' ', names=['filepath'], dtype={"filepath":"str"})
 
-    model = xceptionModel((139,139,3))
+    model = ResNet((224,224,3))
     model.load_weights("w.h5", by_name=True)
 
     result = open("result.csv", "w+", encoding='UTF-8')
@@ -17,7 +17,7 @@ if __name__ == '__main__':
         r = row[1]
         f = r['filepath']
 
-        Img = Image.open( os.path.join(datapath,'test', f) ).resize((139, 139),Image.ANTIALIAS)
+        Img = Image.open( os.path.join(datapath,'test', f) ).resize((224, 224),Image.ANTIALIAS)
         Img = np.expand_dims(np.array( Img ),axis=0) / 255.0
 
         res = model.predict(Img)
