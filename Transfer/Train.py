@@ -1,4 +1,4 @@
-from Model import xceptionModel
+from Model import ResNet
 from Utils import DataGen
 from keras.optimizers import *
 from keras.callbacks import EarlyStopping,ModelCheckpoint
@@ -6,8 +6,8 @@ import os
 
 if __name__ == '__main__':
     datapath = "/home/Signboard/datasets"
-    shape = 139
-    model = xceptionModel((shape,shape,3))
+    shape = 224
+    model = ResNet((shape,shape,3))
     optimizer = SGD(lr=0.001, clipnorm=5.0, momentum=0.9, decay=1e-5)
     model.compile(optimizer=optimizer, loss="sparse_categorical_crossentropy", metrics=['acc'])
 
