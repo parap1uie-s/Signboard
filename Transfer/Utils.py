@@ -36,6 +36,35 @@ def DataGen(datapath, shape, batch_size=32, phase='train'):
         y = np.array(y)
         yield x, y
 
+def TestDataGen(datapath, shape, batch_size=32):
+    csv_handle = pd.read_csv(os.path.join(datapath, "test.txt"), sep=' ', names=['filepath'],dtype={"filepath":"str"})
+
+    data_num = len(csv_handle)
+    ind = 0
+    while True:
+        x = []
+        y = []
+        if ind >= data_num:
+            break
+        choiced_data = csv_handle.iloc[ind:min(ind+batch_size,data_num),:]
+        for row in choiced_data.iterrows():
+            r = row[1]
+            Img = Image.open(os.path.join(datapath, 'test', r['filepath'])).resize((shape,shape),Image.ANTIALIAS)
+
+            aug =  random.randint(0,2)
+            # 水平翻转
+            if aug == 1:
+                Img = Img.transpose(Image.FLIP_LEFT_RIGHT)
+            elif aug == 2:
+                Img = Img.transpose(Image.FLIP_TOP_BOTTOM)
+            x.append(np.array(Img))
+            y.append(r['filepath'])
+
+        x = np.array(x) / 255.0
+        y = np.array(y)
+        ind += batch_size
+        yield x, y
+
 def moveImg(datapath):
     from sklearn.model_selection import train_test_split
     all_pd = pd.read_csv( os.path.join(datapath, "train.txt"), sep=' ', names=['filepath', 'classid'], dtype={"filepath":"str", "classid":"str"})
