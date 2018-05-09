@@ -32,9 +32,9 @@ def ResNet(input_shape,architecture='resnet50'):
         x = identity_block(x, 3, [256, 256, 1024], stage=4, block=chr(98 + i))
     x = STN_block(x,4)
     # Stage 5
-    x = conv_block(x, 3, [256, 256, 256], stage=5, block='a', dilated=1, strides=(1, 1))
-    x = identity_block(x, 3, [256, 256, 256], stage=5, block='b', dilated=1)
-    x = identity_block(x, 3, [256, 256, 256], stage=5, block='c', dilated=1)
+    x = conv_block(x, 3, [256, 256, 256], stage=5, block='a', strides=(1, 1))
+    x = identity_block(x, 3, [256, 256, 256], stage=5, block='b')
+    x = identity_block(x, 3, [256, 256, 256], stage=5, block='c')
 
     # Final
     x = KL.GlobalAveragePooling2D()(x)
@@ -44,7 +44,7 @@ def ResNet(input_shape,architecture='resnet50'):
     return model
 
 def conv_block(input_tensor, kernel_size, filters, stage, block,
-           strides=(2, 2), use_bias=True, dilated=1):
+           strides=(2, 2), use_bias=True):
     """conv_block is the block that has a conv layer at shortcut
     # Arguments
         input_tensor: input tensor
@@ -65,7 +65,7 @@ def conv_block(input_tensor, kernel_size, filters, stage, block,
     x = KL.Activation('relu')(x)
 
     x = KL.Conv2D(nb_filter2, (kernel_size, kernel_size), padding='same',
-                  name=conv_name_base + '2b', use_bias=use_bias, dilation_rate=dilated)(x)
+                  name=conv_name_base + '2b', use_bias=use_bias)(x)
     x = BatchNorm(axis=3, name=bn_name_base + '2b')(x)
     x = KL.Activation('relu')(x)
 
@@ -82,7 +82,7 @@ def conv_block(input_tensor, kernel_size, filters, stage, block,
     return x
 
 def identity_block(input_tensor, kernel_size, filters, stage, block,
-               use_bias=True, dilated=1):
+               use_bias=True):
     """The identity_block is the block that has no conv layer at shortcut
     # Arguments
         input_tensor: input tensor
@@ -101,7 +101,7 @@ def identity_block(input_tensor, kernel_size, filters, stage, block,
     x = KL.Activation('relu')(x)
 
     x = KL.Conv2D(nb_filter2, (kernel_size, kernel_size), padding='same',
-                  name=conv_name_base + '2b', use_bias=use_bias, dilation_rate=dilated)(x)
+                  name=conv_name_base + '2b', use_bias=use_bias)(x)
     x = BatchNorm(axis=3, name=bn_name_base + '2b')(x)
     x = KL.Activation('relu')(x)
 
