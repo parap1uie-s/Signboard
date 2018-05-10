@@ -35,6 +35,11 @@ def ResNet(input_shape,architecture='resnet50'):
     x = conv_block(x, 3, [256, 256, 256], stage=5, block='a', strides=(1, 1))
     x = identity_block(x, 3, [256, 256, 256], stage=5, block='b')
     x = identity_block(x, 3, [256, 256, 256], stage=5, block='c')
+    x = STN_block(x,5)
+    # Stage 6
+    x = conv_block(x, 3, [256, 256, 256], stage=6, block='a', strides=(1, 1))
+    x = identity_block(x, 3, [256, 256, 256], stage=6, block='b')
+    x = identity_block(x, 3, [256, 256, 256], stage=6, block='c')
 
     # Final
     x = KL.GlobalAveragePooling2D()(x)
