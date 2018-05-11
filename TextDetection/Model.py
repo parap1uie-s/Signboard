@@ -118,17 +118,17 @@ class BatchNorm(KL.BatchNormalization):
         return super(self.__class__, self).call(inputs, training=True)
 
 
-def get_cam_model(self):
-        model = ResNetBase()
-        last_conv_output = model.layers[-4].output
-        
-        x = BinearUpSampling2D((224, 224))(last_conv_output)
-        x = KL.Reshape((224 * 224, 1024))(x)
-        x = KL.Dense(2, name="cam_cls")(x)
-        x = KL.Reshape((224, 224, 2))(x)
-        
-        detector = Model(inputs=model.input, outputs=x)
-        return detector
+def get_cam_model():
+    model = ResNetBase((224,224,3))
+    last_conv_output = model.layers[-4].output
+    
+    x = BinearUpSampling2D((224, 224))(last_conv_output)
+    x = KL.Reshape((224 * 224, 1024))(x)
+    x = KL.Dense(2, name="cam_cls")(x)
+    x = KL.Reshape((224, 224, 2))(x)
+    
+    detector = Model(inputs=model.input, outputs=x)
+    return detector
 
 class BinearUpSampling2D(Layer):
 
