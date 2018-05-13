@@ -28,7 +28,7 @@ def ResNetBase(input_shape,architecture='resnet50'):
 
     # Final
     x = KL.Conv2D(1024, (3,3), padding='same')(x)
-    x = KL.BatchNormalization(axis = 3)(x)
+    x = BatchNorm(axis = 3)(x)
     x = KL.Activation('relu')(x)
     x = KL.GlobalAveragePooling2D(name='cam_average_pooling')(x)
     x = KL.Dense(2, activation='softmax', name='cam_cls')(x)

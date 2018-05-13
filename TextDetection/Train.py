@@ -13,20 +13,13 @@ if __name__ == '__main__':
     model.load_weights("/home/professorsfx/.keras/models/resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5", by_name=True, skip_mismatch=True)
 
     train_generator = build_generator("dataset/train", augment=True)
-    val_generator = build_generator("dataset/val", augment=True)
-
-    callbacks = [EarlyStopping(monitor='val_loss', min_delta=0.01, patience=10, verbose=0, mode='auto'), 
-    ModelCheckpoint("text_detection.h5", monitor='val_loss', verbose=0, save_best_only=True, save_weights_only=True, mode='auto', period=1)]
 
     model.fit_generator(
         train_generator,
         steps_per_epoch = len(train_generator),
-        epochs=1000, 
+        epochs=20, 
         use_multiprocessing=True,
         max_queue_size=100,
-        workers=2,
-        validation_data=val_generator,
-        validation_steps=len(val_generator),
-        callbacks=callbacks)
+        workers=2)
     model.save_weights("text_detection.h5")
     
