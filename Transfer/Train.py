@@ -2,6 +2,7 @@ from Model import ResNet
 from Utils import DataGen
 from keras.optimizers import *
 from keras.callbacks import EarlyStopping,ModelCheckpoint
+from keras.preprocessing.image import ImageDataGenerator
 import os
 
 if __name__ == '__main__':
@@ -19,15 +20,40 @@ if __name__ == '__main__':
     callbacks = [EarlyStopping(monitor='val_loss', min_delta=0.01, patience=10, verbose=0, mode='auto'), 
     ModelCheckpoint("w.h5", monitor='val_loss', verbose=0, save_best_only=True, save_weights_only=True, mode='auto', period=1)]
 
+    train_datagen = ImageDataGenerator(
+        shear_range=0.2,
+        zoom_range=0.2,
+        rotation_range=40,
+        width_shift_range=0.2,
+        height_shift_range=0.2,
+        horizontal_flip=True,
+        vertical_flip=True)
+
+    val_datagen = ImageDataGenerator()
+
+    train_generator = train_datagen.flow_from_directory(
+            os.path.join(datapath, "train"),
+            target_size=(shape, shape),
+            batch_size=2,
+            class_mode='sparse',
+            shuffle = "false")
+
+    validation_generator = val_datagen.flow_from_directory(
+            os.path.join(datapath, "val"),
+            target_size=(shape, shape),
+            batch_size=1,
+            class_mode='sparse',
+            shuffle = "false")
     model.fit_generator(
-        DataGen(datapath, shape, batch_size=4, phase='train'), 
-        steps_per_epoch=256, 
-        epochs=1000, 
+        # DataGen(datapath, shape, batch_size=4, phase='train'), 
+        train_generator,
+        steps_per_epoch=len(train_generator), 
+        epochs=100, 
         use_multiprocessing=True,
         max_queue_size=100,
         workers=4,
-        validation_data=DataGen(datapath, shape, batch_size=16, phase='val'),
-        validation_steps=20,
+        # validation_data=DataGen(datapath, shape, batch_size=16, phase='val'),
+        validation_data=validation_generator,
+        validation_steps=len(validation_generator),
         callbacks=callbacks)
-    model.save_weights("w.h5")
     

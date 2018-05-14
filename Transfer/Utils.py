@@ -60,7 +60,7 @@ def TestDataGen(datapath, shape, batch_size=32):
             x.append(np.array(Img))
             y.append(r['filepath'])
 
-        x = np.array(x) / 255.0
+        x = np.array(x)
         y = np.array(y)
         ind += batch_size
         yield x, y
