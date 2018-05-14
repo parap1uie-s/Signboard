@@ -34,16 +34,16 @@ if __name__ == '__main__':
     train_generator = train_datagen.flow_from_directory(
             os.path.join(datapath, "train"),
             target_size=(shape, shape),
-            batch_size=2,
+            batch_size=4,
             class_mode='sparse',
-            shuffle = "false")
+            shuffle = True)
 
     validation_generator = val_datagen.flow_from_directory(
             os.path.join(datapath, "val"),
             target_size=(shape, shape),
-            batch_size=1,
+            batch_size=32,
             class_mode='sparse',
-            shuffle = "false")
+            shuffle = True)
     model.fit_generator(
         # DataGen(datapath, shape, batch_size=4, phase='train'), 
         train_generator,
