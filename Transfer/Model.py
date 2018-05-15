@@ -12,6 +12,7 @@ def XceptionTransfer(input_shape):
     x = KL.Dense(1024, activation='relu')(x)
     x = KL.Dense(100, activation='softmax', name='output')(x)
     model = Model(baseModel.input, outputs=x)
+    return model
 
 def ResNet(input_shape,architecture='resnet50'):
     img_input = Input(shape=input_shape)

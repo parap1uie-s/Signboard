@@ -97,8 +97,10 @@ def train(model,
                     if isinstance(outputs, list):
                         loss = criterion(outputs[0], labels)
                         loss += criterion(outputs[1], labels)
-                        outputs = (outputs[0]+outputs[1])/2
-
+                        temp = 0
+                        for output in outputs:
+                            temp += output
+                        outputs = temp / len(outputs)
                     else:
                         loss = criterion(outputs, labels)
                     _, preds = torch.max(outputs, 1)

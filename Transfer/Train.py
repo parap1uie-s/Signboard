@@ -13,13 +13,13 @@ if __name__ == '__main__':
     optimizer = SGD(lr=0.001, clipnorm=5.0, momentum=0.9, decay=1e-5)
     model.compile(optimizer=optimizer, loss="sparse_categorical_crossentropy", metrics=['acc'])
 
-    if os.path.exists("w.h5"):
-        model.load_weights("w.h5", by_name=True, skip_mismatch=True)
+    if os.path.exists("xception.h5"):
+        model.load_weights("xception.h5", by_name=True, skip_mismatch=True)
     else:
         model.load_weights("/home/professorsfx/.keras/models/resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5", by_name=True, skip_mismatch=True)
 
     callbacks = [EarlyStopping(monitor='val_loss', min_delta=0.01, patience=10, verbose=0, mode='auto'), 
-    ModelCheckpoint("w.h5", monitor='val_loss', verbose=0, save_best_only=True, save_weights_only=True, mode='auto', period=1)]
+    ModelCheckpoint("xception.h5", monitor='val_loss', verbose=0, save_best_only=True, save_weights_only=True, mode='auto', period=1)]
 
     train_datagen = ImageDataGenerator(
         shear_range=0.2,

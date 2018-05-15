@@ -40,7 +40,7 @@ data_loader['test'] = torchdata.DataLoader(data_set['test'], batch_size=8, num_w
                                            shuffle=False, pin_memory=True, collate_fn=collate_fn)
 
 model_name = 'resnet50-out'
-resume = 'resnet50/weights-31-73-[0.9902].pth'
+resume = 'resnet50/weights-10-230-[0.9829].pth'
 
 # model =resnet50(pretrained=True)
 # model.avgpool = torch.nn.AdaptiveAvgPool2d(output_size=1)
@@ -72,7 +72,10 @@ for batch_cnt_test, data_test in enumerate(data_loader['test']):
     if isinstance(outputs, list):
         loss = criterion(outputs[0], labels)
         loss += criterion(outputs[1], labels)
-        outputs = (outputs[0]+outputs[1])/2
+        temp = 0
+        for output in outputs:
+            temp += output
+        outputs = temp / len(outputs)
     else:
         loss = criterion(outputs, labels)
     _, preds = torch.max(outputs, 1)
