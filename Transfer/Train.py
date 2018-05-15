@@ -1,4 +1,4 @@
-from Model import ResNet
+from Model import *
 from Utils import DataGen
 from keras.optimizers import *
 from keras.callbacks import EarlyStopping,ModelCheckpoint
@@ -8,7 +8,8 @@ import os
 if __name__ == '__main__':
     datapath = "/home/Signboard/datasets"
     shape = 224
-    model = ResNet((shape,shape,3))
+    # model = ResNet((shape,shape,3))
+    model = XceptionTransfer((shape,shape,3))
     optimizer = SGD(lr=0.001, clipnorm=5.0, momentum=0.9, decay=1e-5)
     model.compile(optimizer=optimizer, loss="sparse_categorical_crossentropy", metrics=['acc'])
 
@@ -27,9 +28,12 @@ if __name__ == '__main__':
         width_shift_range=0.2,
         height_shift_range=0.2,
         horizontal_flip=True,
-        vertical_flip=True)
+        vertical_flip=True,
+        fill_mode="constant",
+        cval=0,
+        rescale=1.0/255.0)
 
-    val_datagen = ImageDataGenerator()
+    val_datagen = ImageDataGenerator(rescale=1.0/255.0)
 
     train_generator = train_datagen.flow_from_directory(
             os.path.join(datapath, "train"),
@@ -41,7 +45,7 @@ if __name__ == '__main__':
     validation_generator = val_datagen.flow_from_directory(
             os.path.join(datapath, "val"),
             target_size=(shape, shape),
-            batch_size=1,
+            batch_size=32,
             class_mode='sparse',
             shuffle = "false")
     model.fit_generator(

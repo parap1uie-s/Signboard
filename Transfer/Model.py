@@ -4,6 +4,14 @@ from keras import backend as K
 from keras.engine.topology import Layer
 import tensorflow as tf
 from STN import transformer
+from keras.applications.xception import Xception
+
+def XceptionTransfer(input_shape):
+    baseModel = Xception(include_top=False, weights='imagenet', input_shape=input_shape, pooling="avg")
+    x = baseModel.output
+    x = KL.Dense(1024, activation='relu')(x)
+    x = KL.Dense(100, activation='softmax', name='output')(x)
+    model = Model(baseModel.input, outputs=x)
 
 def ResNet(input_shape,architecture='resnet50'):
     img_input = Input(shape=input_shape)
