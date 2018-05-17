@@ -23,14 +23,14 @@ if __name__ == '__main__':
 
     train_datagen = ImageDataGenerator(
         shear_range=0.2,
-        zoom_range=0.2,
-        rotation_range=40,
+        zoom_range=0.3,
+        rotation_range=20,
+        channel_shift_range=20,
         width_shift_range=0.2,
         height_shift_range=0.2,
         horizontal_flip=True,
         vertical_flip=True,
-        fill_mode="constant",
-        cval=0,
+        fill_mode="nearest",
         rescale=1.0/255.0)
 
     val_datagen = ImageDataGenerator(rescale=1.0/255.0)
@@ -51,13 +51,13 @@ if __name__ == '__main__':
     model.fit_generator(
         # DataGen(datapath, shape, batch_size=4, phase='train'), 
         train_generator,
-        steps_per_epoch=len(train_generator), 
+        steps_per_epoch=len(train_generator)+1, 
         epochs=100, 
         use_multiprocessing=True,
         max_queue_size=100,
         workers=4,
         # validation_data=DataGen(datapath, shape, batch_size=16, phase='val'),
         validation_data=validation_generator,
-        validation_steps=len(validation_generator),
+        validation_steps=len(validation_generator)+1,
         callbacks=callbacks)
     

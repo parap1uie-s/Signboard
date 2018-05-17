@@ -40,7 +40,7 @@ data_loader['test'] = torchdata.DataLoader(data_set['test'], batch_size=8, num_w
                                            shuffle=False, pin_memory=True, collate_fn=collate_fn)
 
 model_name = 'resnet50-out'
-resume = 'resnet50/weights-48-384-[0.9780].pth'
+resume = 'resnet50/weights-11-13-[0.9902].pth'
 
 # model =resnet50(pretrained=True)
 # model.avgpool = torch.nn.AdaptiveAvgPool2d(output_size=1)
@@ -72,10 +72,8 @@ for batch_cnt_test, data_test in enumerate(data_loader['test']):
     if isinstance(outputs, list):
         loss = criterion(outputs[0], labels)
         loss += criterion(outputs[1], labels)
-        temp = 0
-        for output in outputs:
-            temp += output
-        outputs = temp / len(outputs)
+        loss += criterion(outputs[2], labels)
+        outputs = (outputs[0] + outputs[1] + outputs[2]) / 3
     else:
         loss = criterion(outputs, labels)
     _, preds = torch.max(outputs, 1)
@@ -95,5 +93,14 @@ print('test-loss: %.4f ||test-acc@1: %.4f'
 test_pred = test_pd[['filepath']].copy()
 test_pred['classid'] = list(test_preds)
 test_pred['classid'] = test_pred['classid'].apply(lambda x: int(x)+1)
-test_pred[['filepath',"classid"]].to_csv('result.csv'.format(model_name,mode) ,sep=" ", header=None, index=False)
-print(test_pred.info())
+
+test_pred.columns = ['filepath', 'classid']
+gt_result = pd.read_csv( os.path.join(datapath, "test_groundtruth.csv"), sep=' ', names=['filepath', 'classid'],
+    dtype={"filepath":"str", "classid":"int"})
+compare = test_pred.merge(gt_result, how='left', on='filepath')
+def equal(a, b):
+    return int(a) == int(b)
+compare['res'] = compare.apply(lambda row: equal(row['classid_x'], row['classid_y']), axis=1)
+
+acc = compare['res'].sum()
+test_pred.to_csv("result-{:0>4}.csv".format(acc), sep=' ', header=False, index=False)

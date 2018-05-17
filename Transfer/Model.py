@@ -10,6 +10,7 @@ def Transfer(input_shape):
     baseModel = InceptionResNetV2(include_top=False, weights='imagenet', input_shape=input_shape, pooling="avg")
     x = baseModel.output
     x = KL.Dense(1024, activation='relu')(x)
+    x = KL.Dropout(0.3)(x)
     x = KL.Dense(100, activation='softmax', name='output')(x)
     model = Model(baseModel.input, outputs=x)
     return model
