@@ -35,8 +35,9 @@ if __name__ == '__main__':
         dtype={"filepath":"str", "classid":"int"})
     compare = pred_result.merge(gt_result, how='left', on='filepath')
     def equal(a, b):
-        return a == b
+        return int(a) == int(b)
     compare['res'] = compare.apply(lambda row: equal(row['classid_x'], row['classid_y']), axis=1)
+    print(compare)
     acc = compare['res'].sum()
     pred_result.to_csv("result-{:0>4}.csv".format(acc), sep=' ', header=False, index=False)
     # result = open("result.csv", "w+", encoding='UTF-8')
