@@ -40,7 +40,7 @@ data_loader['test'] = torchdata.DataLoader(data_set['test'], batch_size=8, num_w
                                            shuffle=False, pin_memory=True, collate_fn=collate_fn)
 
 model_name = 'resnet50-out'
-resume = 'resnet50/weights-10-230-[0.9829].pth'
+resume = 'resnet50/weights-48-384-[0.9780].pth'
 
 # model =resnet50(pretrained=True)
 # model.avgpool = torch.nn.AdaptiveAvgPool2d(output_size=1)

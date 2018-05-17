@@ -9,17 +9,17 @@ if __name__ == '__main__':
     datapath = "/home/Signboard/datasets"
     shape = 224
     # model = ResNet((shape,shape,3))
-    model = XceptionTransfer((shape,shape,3))
+    model = Transfer((shape,shape,3))
     optimizer = SGD(lr=0.001, clipnorm=5.0, momentum=0.9, decay=1e-5)
     model.compile(optimizer=optimizer, loss="sparse_categorical_crossentropy", metrics=['acc'])
 
-    if os.path.exists("xception.h5"):
-        model.load_weights("xception.h5", by_name=True, skip_mismatch=True)
-    else:
-        model.load_weights("/home/professorsfx/.keras/models/resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5", by_name=True, skip_mismatch=True)
+    if os.path.exists("Transfer.h5"):
+        model.load_weights("Transfer.h5", by_name=True, skip_mismatch=True)
+    # else:
+        # model.load_weights("/home/professorsfx/.keras/models/resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5", by_name=True, skip_mismatch=True)
 
     callbacks = [EarlyStopping(monitor='val_loss', min_delta=0.01, patience=10, verbose=0, mode='auto'), 
-    ModelCheckpoint("xception.h5", monitor='val_loss', verbose=0, save_best_only=True, save_weights_only=True, mode='auto', period=1)]
+    ModelCheckpoint("Transfer.h5", monitor='val_loss', verbose=0, save_best_only=True, save_weights_only=True, mode='auto', period=1)]
 
     train_datagen = ImageDataGenerator(
         shear_range=0.2,

@@ -4,10 +4,10 @@ from keras import backend as K
 from keras.engine.topology import Layer
 import tensorflow as tf
 from STN import transformer
-from keras.applications.xception import Xception
+from keras.applications.inception_resnet_v2 import InceptionResNetV2
 
-def XceptionTransfer(input_shape):
-    baseModel = Xception(include_top=False, weights='imagenet', input_shape=input_shape, pooling="avg")
+def Transfer(input_shape):
+    baseModel = InceptionResNetV2(include_top=False, weights='imagenet', input_shape=input_shape, pooling="avg")
     x = baseModel.output
     x = KL.Dense(1024, activation='relu')(x)
     x = KL.Dense(100, activation='softmax', name='output')(x)

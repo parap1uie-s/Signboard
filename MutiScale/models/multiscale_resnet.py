@@ -28,7 +28,7 @@ class multiscale_resnet(nn.Module):
 
         x3 = self.base_model(x3)
         x3 = self.avgpool(x3)
-        x3 = x3.view(x2.size(0), -1)
+        x3 = x3.view(x3.size(0), -1)
 
         out =[]
         out.append(self.classifier(x))
