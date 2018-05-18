@@ -49,6 +49,7 @@ def ResNet(input_shape,architecture='resnet50'):
     x = KL.BatchNormalization()(x)
     x = KL.Dropout(0.25)(x)
     x = KL.Dense(512, activation='relu')(x)
+    x = KL.Dropout(0.3)(x)
     x = KL.Dense(100, activation='softmax',name="output")(x)
     model = Model(img_input, outputs=x)
     return model
