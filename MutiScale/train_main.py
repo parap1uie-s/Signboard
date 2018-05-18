@@ -20,7 +20,7 @@ val_pd = pd.read_csv(os.path.join(datapath, "val_split.txt"), sep=' ', names=['f
 '''数据扩增'''
 data_transforms = {
     'train': transforms.Compose([
-        transforms.RandomRotation(degrees=20),
+        transforms.RandomRotation(degrees=30),
         transforms.RandomResizedCrop(224,scale=(0.49,1.0)),
         # transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),   # 0-255 to 0-1
@@ -57,7 +57,7 @@ dataloader['val']=torch.utils.data.DataLoader(data_set['val'], batch_size=4,
 # model.fc = torch.nn.Linear(model.fc.in_features,100)
 model =multiscale_resnet(num_class=100)
 base_lr =0.001
-resume = 'resnet50/weights-9-47-[0.9780].pth'
+resume = 'resnet50/weights-12-196-[0.9853].pth'
 # resume = None
 if resume:
     logging.info('resuming finetune from %s'%resume)

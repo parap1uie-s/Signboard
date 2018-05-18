@@ -5,7 +5,7 @@ import torch.nn.functional as F
 class multiscale_resnet(nn.Module):
     def __init__(self,num_class):
         super(multiscale_resnet,self).__init__()
-        resnet50 =models.resnet50(pretrained=True)
+        resnet50 =models.resnet152(pretrained=True)
         self.base_model =nn.Sequential(*list(resnet50.children())[:-2])
         self.avgpool = nn.AdaptiveAvgPool2d(output_size=1)
         self.classifier = nn.Linear(resnet50.fc.in_features,num_class)

@@ -36,11 +36,11 @@ data_set['test'] = testdataset(imgroot=os.path.join(datapath, "test"), anno_pd=t
                              transforms=test_transforms,
                              )
 data_loader = {}
-data_loader['test'] = torchdata.DataLoader(data_set['test'], batch_size=8, num_workers=4,
+data_loader['test'] = torchdata.DataLoader(data_set['test'], batch_size=4, num_workers=4,
                                            shuffle=False, pin_memory=True, collate_fn=collate_fn)
 
 model_name = 'resnet50-out'
-resume = 'resnet50/weights-11-13-[0.9902].pth'
+resume = 'resnet50/weights-9-47-[0.9804].pth'
 
 # model =resnet50(pretrained=True)
 # model.avgpool = torch.nn.AdaptiveAvgPool2d(output_size=1)
