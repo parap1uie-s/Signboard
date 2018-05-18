@@ -39,11 +39,9 @@ def Compare(vote_result,test_truth):
     print('acc of vote_result',acc)
 
 if __name__ == '__main__':
-    Submission_path = "E:\\shangfangxin\\Git\\Signboard\\Submission"
+    Submission_path = "Submission"
 
     vote_result = "vote_result.csv"
-    test_truth = "MakeGT/test_groundtruth.csv"
+    test_truth = "test_groundtruth.csv"
     MergeResult(Submission_path,vote_result)
     Compare(vote_result,test_truth)
-
-
