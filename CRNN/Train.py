@@ -1,5 +1,4 @@
 from Model import *
-from Utils import DataGen
 from keras.optimizers import *
 from keras.callbacks import EarlyStopping,ModelCheckpoint
 from keras.preprocessing.image import ImageDataGenerator
@@ -23,10 +22,10 @@ if __name__ == '__main__':
     ModelCheckpoint("CRNN.h5", monitor='val_loss', verbose=0, save_best_only=True, save_weights_only=True, mode='auto', period=1)]
 
     train_datagen = ImageDataGenerator(
-        shear_range=0.2,
+        # shear_range=0.2,
         rotation_range=20,
-        width_shift_range=0.2,
-        height_shift_range=0.2,
+        # width_shift_range=0.2,
+        # height_shift_range=0.2,
         horizontal_flip=True,
         vertical_flip=True,
         fill_mode="nearest",
