@@ -31,6 +31,7 @@ def AttentionResNet56(shape=(224, 224, 3), n_channels=64, n_classes=100,
     x = residual_block(x, output_channels=n_channels * 32)
 
     x = GlobalAveragePooling2D()(x)
+    x = Dense(1000, activation='relu')(x)
     if dropout:
         x = Dropout(dropout)(x)
     output = Dense(n_classes, kernel_regularizer=regularizer, activation='softmax')(x)
