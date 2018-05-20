@@ -35,7 +35,7 @@ def GridMergeResult(Submission_path):
             vote_label = np.array(vote_label)
             tempRes = true_label == vote_label
             acc = sum(tempRes.astype(np.int64)) / len(tempRes)
-            if acc > bestAcc:
+            if acc >= bestAcc:
                 bestAcc = acc
                 bestComb = fileList
                 print(bestAcc)
@@ -48,8 +48,8 @@ def MergeResult(Submission_path,vote_result):
     labels = []
     # fileLists = os.listdir(Submission_path)
     # fileLists = [fileLists[i] for i in [0, 5, 6, 8, 9, 11, 12]]
-    fileLists = ['result-0920.csv', 'result-0967-densenet.csv', 'result-0956.csv',
-     'result-0962.csv', 'result-0958.csv', 'result-0899.csv', 'result-0984.csv']
+    fileLists = ['result-0899-xception.csv', 'result-0984_vote.csv', 'result-0967-densenet.csv', 
+    'result-0962-mutiscale_3.csv', 'result-0956-mutiscale.csv', 'result-0935-CRNN.csv', 'result-0920-resnet50.csv']
 
     read_img_id = False
     for result in fileLists:
