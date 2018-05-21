@@ -48,8 +48,9 @@ def MergeResult(Submission_path,vote_result):
     labels = []
     # fileLists = os.listdir(Submission_path)
     # fileLists = [fileLists[i] for i in [0, 5, 6, 8, 9, 11, 12]]
-    fileLists = ['result-0899-xception.csv', 'result-0984_vote.csv', 'result-0967-densenet.csv', 
-    'result-0962-mutiscale_3.csv', 'result-0956-mutiscale.csv', 'result-0935-CRNN.csv', 'result-0920-resnet50.csv']
+    # 0987
+    fileLists = ['result-0985_vote.csv', 'result-0899-xception.csv', 'result-0920-resnet50.csv', 
+    'result-0941-xception.csv', 'result-0956-mutiscale.csv', 'result-0962-mutiscale_3.csv', 'result-0972-densenet_4c.csv']
 
     read_img_id = False
     for result in fileLists:

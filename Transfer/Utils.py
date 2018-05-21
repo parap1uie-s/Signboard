@@ -23,12 +23,12 @@ def DataGen(datapath, shape, batch_size=32, phase='train'):
             r = row[1]
             Img = Image.open(os.path.join(datapath, phase, r['classid'], r['filepath'])).resize((shape,shape),Image.ANTIALIAS)
 
-            aug =  random.randint(0,2)
-            # 水平翻转
-            if aug == 1:
-                Img = Img.transpose(Image.FLIP_LEFT_RIGHT)
-            elif aug == 2:
-                Img = Img.transpose(Image.FLIP_TOP_BOTTOM)
+            # aug =  random.randint(0,2)
+            # # 水平翻转
+            # if aug == 1:
+            #     Img = Img.transpose(Image.FLIP_LEFT_RIGHT)
+            # elif aug == 2:
+            #     Img = Img.transpose(Image.FLIP_TOP_BOTTOM)
             x.append(np.array(Img))
             y.append(int(r['classid'])-1)
 

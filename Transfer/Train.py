@@ -8,7 +8,7 @@ import os
 if __name__ == '__main__':
     datapath = "/home/Signboard/datasets"
     shape = 224
-    modelType = 'xeception'
+    modelType = 'inception'
 
     if modelType == "densenet":
         model = DenseNetTransfer((shape,shape,3))
@@ -18,6 +18,8 @@ if __name__ == '__main__':
         model = ResNet((shape,shape,3))
     elif modelType == "xeception":
         model = XceptionTransfer((shape,shape,3))
+    elif modelType == "inception":
+        model = InceptionTransfer((shape,shape,3))
 
     optimizer = SGD(lr=0.001, clipnorm=5.0, momentum=0.9, decay=1e-5)
     model.compile(optimizer=optimizer, loss="sparse_categorical_crossentropy", metrics=['acc'])
@@ -37,8 +39,8 @@ if __name__ == '__main__':
         channel_shift_range=20,
         width_shift_range=0.2,
         height_shift_range=0.2,
-        horizontal_flip=True,
-        vertical_flip=True,
+        # horizontal_flip=True,
+        # vertical_flip=True,
         fill_mode="nearest",
         rescale=1.0/255.0)
 

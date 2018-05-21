@@ -42,6 +42,7 @@ if __name__ == '__main__':
     sub = pd.DataFrame({'filepath': img_id, 'freq': label_fre})
     gt_result['res'] = wrong_result
     gt_result = gt_result.merge(sub, how='left', on='filepath')
-    gt_result[gt_result['res'] == False].loc[:,['filepath','classid','freq']].to_csv("wrong.csv", index=False, header=True, sep=',')
+    # gt_result[gt_result['res'] == False].loc[:,['filepath','classid','freq']].to_csv("wrong.csv", index=False, header=True, sep=',')
+    print( gt_result[gt_result['res'] == False].loc[:,['filepath','classid','freq']] )
 
         

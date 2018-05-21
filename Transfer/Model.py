@@ -7,31 +7,58 @@ from STN import transformer
 from keras.applications.inception_resnet_v2 import InceptionResNetV2
 from keras.applications.densenet import DenseNet201
 from keras.applications.xception import Xception
-def Transfer(input_shape):
-    baseModel = InceptionResNetV2(include_top=False, weights='imagenet', input_shape=input_shape, pooling="avg")
+from keras.applications.inception_v3 import InceptionV3
+
+def InceptionTransfer(input_shape):
+    input_tensor = KL.Input((input_shape))
+    gray_tensor = RGB2GrayLayer()(input_tensor) # 224,224,1
+    x = KL.Concatenate(axis=-1)([input_tensor, gray_tensor]) # 224,224,4
+
+    baseModel = InceptionV3(include_top=False, weights=None, input_tensor=x, pooling="avg")
     x = baseModel.output
     x = KL.Dense(1024, activation='relu')(x)
     x = KL.Dropout(0.3)(x)
     x = KL.Dense(100, activation='softmax', name='output')(x)
-    model = Model(baseModel.input, outputs=x)
+    model = Model(input_tensor, outputs=x)
+    return model
+
+def Transfer(input_shape):
+    input_tensor = KL.Input((input_shape))
+    gray_tensor = RGB2GrayLayer()(input_tensor) # 224,224,1
+    x = KL.Concatenate(axis=-1)([input_tensor, gray_tensor]) # 224,224,4
+
+    baseModel = InceptionResNetV2(include_top=False, weights=None, input_tensor=x, pooling="avg")
+    x = baseModel.output
+    x = KL.Dense(1024, activation='relu')(x)
+    x = KL.Dropout(0.3)(x)
+    x = KL.Dense(100, activation='softmax', name='output')(x)
+    model = Model(input_tensor, outputs=x)
     return model
 
 def XceptionTransfer(input_shape):
-    baseModel = Xception(include_top=False, weights='imagenet', input_shape=input_shape, pooling="avg")
+    input_tensor = KL.Input((input_shape))
+    gray_tensor = RGB2GrayLayer()(input_tensor) # 224,224,1
+    x = KL.Concatenate(axis=-1)([input_tensor, gray_tensor]) # 224,224,4
+
+    baseModel = Xception(include_top=False, weights=None, input_tensor=x, pooling="avg")
     x = baseModel.output
     x = KL.Dense(1024, activation='relu')(x)
     x = KL.Dropout(0.3)(x)
     x = KL.Dense(100, activation='softmax', name='output')(x)
-    model = Model(baseModel.input, outputs=x)
+    model = Model(input_tensor, outputs=x)
     return model
 
 def DenseNetTransfer(input_shape):
-    baseModel = DenseNet201(include_top=False, weights='imagenet', input_shape=input_shape, pooling="avg")
+    input_tensor = KL.Input((input_shape))
+    gray_tensor = RGB2GrayLayer()(input_tensor) # 224,224,1
+    x = KL.Concatenate(axis=-1)([input_tensor, gray_tensor]) # 224,224,4
+
+    baseModel = DenseNet201(include_top=False, weights=None, input_tensor=x, pooling="avg")
     x = baseModel.output
     x = KL.Dense(1024, activation='relu')(x)
     x = KL.Dropout(0.3)(x)
     x = KL.Dense(100, activation='softmax', name='output')(x)
-    model = Model(baseModel.input, outputs=x)
+    model = Model(input_tensor, outputs=x)
     return model
 
 def ResNet(input_shape,architecture='resnet50'):
@@ -186,3 +213,14 @@ def STN_block(input_tensor, stage):
 
 def bias_init(shape, dtype=None):
     return K.variable([1,0,0,0,1,0], dtype=dtype)
+
+class RGB2GrayLayer(Layer):
+
+    def __init__(self, **kwargs):
+        super(RGB2GrayLayer, self).__init__(**kwargs)
+
+    def call(self, x):
+        return tf.image.rgb_to_grayscale(x)
+
+    def compute_output_shape(self, input_shape):
+        return (input_shape[0], input_shape[1], input_shape[2], 1)
