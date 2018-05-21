@@ -1,5 +1,4 @@
 from Model import *
-from Utils import DataGen
 from keras.optimizers import *
 from keras.callbacks import EarlyStopping,ModelCheckpoint
 from keras.preprocessing.image import ImageDataGenerator
@@ -9,8 +8,9 @@ if __name__ == '__main__':
     datapath = "/home/Signboard/datasets"
     width = 224
     height = 75
-    model = ResNet((width,height,3))
-    optimizer = SGD(lr=0.01, clipnorm=5.0, momentum=0.9, decay=1e-5)
+    model = ResNet((height,width,3))
+    optimizer = SGD(lr=0.001, clipnorm=5.0, momentum=0.9, decay=1e-5)
+    # optimizer = RMSprop(lr=0.01, decay=1e-5)
     model.compile(optimizer=optimizer, loss="sparse_categorical_crossentropy", metrics=['acc'])
 
     if os.path.exists("CRNN.h5"):
@@ -18,14 +18,13 @@ if __name__ == '__main__':
     else:
         model.load_weights("/home/professorsfx/.keras/models/resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5", by_name=True, skip_mismatch=True)
 
-    callbacks = [EarlyStopping(monitor='val_loss', min_delta=0.01, patience=10, verbose=0, mode='auto'), 
+    callbacks = [EarlyStopping(monitor='val_loss', min_delta=0.01, patience=50, verbose=0, mode='auto'), 
     ModelCheckpoint("CRNN.h5", monitor='val_loss', verbose=0, save_best_only=True, save_weights_only=True, mode='auto', period=1)]
 
     train_datagen = ImageDataGenerator(
         shear_range=0.2,
         zoom_range=0.3,
         rotation_range=20,
-        channel_shift_range=20,
         width_shift_range=0.2,
         height_shift_range=0.2,
         horizontal_flip=True,
@@ -37,14 +36,14 @@ if __name__ == '__main__':
 
     train_generator = train_datagen.flow_from_directory(
             os.path.join(datapath, "train"),
-            target_size=(width, height),
+            target_size=(height, width),
             batch_size=4,
             class_mode='sparse',
             shuffle = True)
 
     validation_generator = val_datagen.flow_from_directory(
             os.path.join(datapath, "val"),
-            target_size=(width, height),
+            target_size=(height, width),
             batch_size=32,
             class_mode='sparse',
             shuffle = True)
@@ -60,4 +59,3 @@ if __name__ == '__main__':
         validation_data=validation_generator,
         validation_steps=len(validation_generator)+1,
         callbacks=callbacks)
-    
