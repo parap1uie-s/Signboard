@@ -8,7 +8,7 @@ import os
 if __name__ == '__main__':
     datapath = "/home/Signboard/datasets"
     shape = 224
-    modelType = 'inception'
+    modelType = 'Resnet'
 
     if modelType == "densenet":
         model = DenseNetTransfer((shape,shape,3))
@@ -18,9 +18,7 @@ if __name__ == '__main__':
         model = ResNet((shape,shape,3))
     elif modelType == "xeception":
         model = XceptionTransfer((shape,shape,3))
-    elif modelType == "inception":
-        model = InceptionTransfer((shape,shape,3))
-
+    
     optimizer = SGD(lr=0.001, clipnorm=5.0, momentum=0.9, decay=1e-5)
     model.compile(optimizer=optimizer, loss="sparse_categorical_crossentropy", metrics=['acc'])
 
@@ -36,7 +34,7 @@ if __name__ == '__main__':
         shear_range=0.2,
         zoom_range=0.3,
         rotation_range=20,
-        channel_shift_range=20,
+        # channel_shift_range=20,
         width_shift_range=0.2,
         height_shift_range=0.2,
         # horizontal_flip=True,
@@ -60,14 +58,12 @@ if __name__ == '__main__':
             class_mode='sparse',
             shuffle = True)
     model.fit_generator(
-        # DataGen(datapath, shape, batch_size=4, phase='train'), 
         train_generator,
         steps_per_epoch=len(train_generator)+1, 
         epochs=100, 
         use_multiprocessing=True,
         max_queue_size=100,
         workers=4,
-        # validation_data=DataGen(datapath, shape, batch_size=16, phase='val'),
         validation_data=validation_generator,
         validation_steps=len(validation_generator)+1,
         callbacks=callbacks)

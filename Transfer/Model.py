@@ -7,20 +7,6 @@ from STN import transformer
 from keras.applications.inception_resnet_v2 import InceptionResNetV2
 from keras.applications.densenet import DenseNet201
 from keras.applications.xception import Xception
-from keras.applications.inception_v3 import InceptionV3
-
-def InceptionTransfer(input_shape):
-    input_tensor = KL.Input((input_shape))
-    gray_tensor = RGB2GrayLayer()(input_tensor) # 224,224,1
-    x = KL.Concatenate(axis=-1)([input_tensor, gray_tensor]) # 224,224,4
-
-    baseModel = InceptionV3(include_top=False, weights=None, input_tensor=x, pooling="avg")
-    x = baseModel.output
-    x = KL.Dense(1024, activation='relu')(x)
-    x = KL.Dropout(0.3)(x)
-    x = KL.Dense(100, activation='softmax', name='output')(x)
-    model = Model(input_tensor, outputs=x)
-    return model
 
 def Transfer(input_shape):
     input_tensor = KL.Input((input_shape))
@@ -62,9 +48,12 @@ def DenseNetTransfer(input_shape):
     return model
 
 def ResNet(input_shape,architecture='resnet50'):
-    img_input = Input(shape=input_shape)
+    input_tensor = KL.Input((input_shape))
+    gray_tensor = RGB2GrayLayer()(input_tensor) # 224,224,1
+    x = KL.Concatenate(axis=-1)([input_tensor, gray_tensor]) # 224,224,4
+
     # stage 1
-    x = KL.ZeroPadding2D((3, 3))(img_input)
+    x = KL.ZeroPadding2D((3, 3))(x)
     x = KL.Conv2D(64, (7, 7), strides=(2, 2), name='conv1', use_bias=True)(x)
     x = BatchNorm(axis=3, name='bn_conv1')(x)
     x = KL.Activation('relu')(x)
@@ -101,7 +90,7 @@ def ResNet(input_shape,architecture='resnet50'):
     x = KL.GlobalAveragePooling2D()(x)
     x = KL.Dense(1000, activation='relu')(x)
     x = KL.Dense(100, activation='softmax', name='output')(x)
-    model = Model(img_input, outputs=x)
+    model = Model(input_tensor, outputs=x)
     return model
 
 def conv_block(input_tensor, kernel_size, filters, stage, block,

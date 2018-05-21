@@ -36,7 +36,7 @@ if __name__ == '__main__':
     #         target_size=(height, width),
     #         shuffle = False,
     #         class_mode=None,
-    #         batch_size=1,
+    #         batch_size=4,
     #         follow_links=True)
 
     # filenames = test_generator.filenames

@@ -20,12 +20,12 @@ def TestDataGen(datapath, width, height, batch_size=32):
             r = row[1]
             Img = Image.open(os.path.join(datapath, 'test', r['filepath'])).resize((width,height),Image.ANTIALIAS)
 
-            aug = random.randint(0,2)
-            # 水平翻转
-            if aug == 1:
-                Img = Img.transpose(Image.FLIP_LEFT_RIGHT)
-            elif aug == 2:
-                Img = Img.transpose(Image.FLIP_TOP_BOTTOM)
+            # aug = random.randint(0,2)
+            # # 水平翻转
+            # if aug == 1:
+            #     Img = Img.transpose(Image.FLIP_LEFT_RIGHT)
+            # elif aug == 2:
+            #     Img = Img.transpose(Image.FLIP_TOP_BOTTOM)
             x.append(np.array(Img))
             y.append(r['filepath'])
 
