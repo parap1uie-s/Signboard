@@ -2,6 +2,45 @@ from keras.models import *
 from keras.layers import *
 from keras.regularizers import l2
 
+def AttentionResNet92(shape=(224, 224, 3), n_channels=64, n_classes=100,
+                      dropout=0, regularization=0.01):
+    """
+    Attention-92 ResNet
+    https://arxiv.org/abs/1704.06904
+    """
+    regularizer = l2(regularization)
+
+    input_ = Input(shape=shape)
+    x = Conv2D(n_channels, (7, 7), strides=(2, 2), padding='same')(input_) # 112x112
+    x = BatchNormalization()(x)
+    x = Activation('relu')(x)
+    x = MaxPool2D(pool_size=(3, 3), strides=(2, 2), padding='same')(x)  # 56x56
+
+    x = residual_block(x, output_channels=n_channels * 4)  # 56x56
+    x = attention_block(x, encoder_depth=3)  # bottleneck 7x7
+
+    x = residual_block(x, output_channels=n_channels * 8, stride=2)  # 28x28
+    x = attention_block(x, encoder_depth=2)  # bottleneck 7x7
+    x = attention_block(x, encoder_depth=2)  # bottleneck 7x7
+
+    x = residual_block(x, output_channels=n_channels * 16, stride=2)  # 14x14
+    x = attention_block(x, encoder_depth=1)  # bottleneck 7x7
+    x = attention_block(x, encoder_depth=1)  # bottleneck 7x7
+    x = attention_block(x, encoder_depth=1)  # bottleneck 7x7
+
+    x = residual_block(x, output_channels=n_channels * 32, stride=2)  # 7x7
+    x = residual_block(x, output_channels=n_channels * 32)
+    x = residual_block(x, output_channels=n_channels * 32)
+
+    x = GlobalAveragePooling2D()(x)
+    if dropout:
+        x = Dropout(dropout)(x)
+    x = Dense(1024, activation='relu')(x)
+    output = Dense(n_classes, kernel_regularizer=regularizer, activation='softmax')(x)
+
+    model = Model(input_, output)
+    return model
+
 def AttentionResNet56(shape=(224, 224, 3), n_channels=64, n_classes=100,
                       dropout=0, regularization=0.01):
     """
@@ -31,9 +70,9 @@ def AttentionResNet56(shape=(224, 224, 3), n_channels=64, n_classes=100,
     x = residual_block(x, output_channels=n_channels * 32)
 
     x = GlobalAveragePooling2D()(x)
-    x = Dense(1000, activation='relu')(x)
     if dropout:
         x = Dropout(dropout)(x)
+    x = Dense(1024, activation='relu')(x)
     output = Dense(n_classes, kernel_regularizer=regularizer, activation='softmax')(x)
 
     model = Model(input_, output)

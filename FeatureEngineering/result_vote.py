@@ -87,7 +87,7 @@ def Compare(vote_result,test_truth):
     print('acc of vote_result',acc)
 
 if __name__ == '__main__':
-    Submission_path = "Submission"
+    Submission_path = "../Submission"
 
     vote_result = "vote_result.csv"
     test_truth = "test_groundtruth.csv"

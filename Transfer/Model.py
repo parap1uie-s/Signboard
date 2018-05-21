@@ -6,9 +6,18 @@ import tensorflow as tf
 from STN import transformer
 from keras.applications.inception_resnet_v2 import InceptionResNetV2
 from keras.applications.densenet import DenseNet201
-
+from keras.applications.xception import Xception
 def Transfer(input_shape):
     baseModel = InceptionResNetV2(include_top=False, weights='imagenet', input_shape=input_shape, pooling="avg")
+    x = baseModel.output
+    x = KL.Dense(1024, activation='relu')(x)
+    x = KL.Dropout(0.3)(x)
+    x = KL.Dense(100, activation='softmax', name='output')(x)
+    model = Model(baseModel.input, outputs=x)
+    return model
+
+def XceptionTransfer(input_shape):
+    baseModel = Xception(include_top=False, weights='imagenet', input_shape=input_shape, pooling="avg")
     x = baseModel.output
     x = KL.Dense(1024, activation='relu')(x)
     x = KL.Dropout(0.3)(x)

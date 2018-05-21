@@ -8,7 +8,7 @@ import os
 if __name__ == '__main__':
     datapath = "/home/Signboard/datasets"
     shape = 224
-    modelType = 'densenet'
+    modelType = 'xeception'
 
     if modelType == "densenet":
         model = DenseNetTransfer((shape,shape,3))
@@ -16,6 +16,8 @@ if __name__ == '__main__':
         model = Transfer((shape,shape,3))
     elif modelType == "Resnet":
         model = ResNet((shape,shape,3))
+    elif modelType == "xeception":
+        model = XceptionTransfer((shape,shape,3))
 
     optimizer = SGD(lr=0.001, clipnorm=5.0, momentum=0.9, decay=1e-5)
     model.compile(optimizer=optimizer, loss="sparse_categorical_crossentropy", metrics=['acc'])
