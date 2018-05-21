@@ -41,12 +41,12 @@ def ResNet(input_shape,architecture='resnet50'):
     # print(conv_shape)
     x = KL.Reshape(target_shape=(int(conv_shape[1]), int(conv_shape[2]*conv_shape[3])))(x)
     x = KL.BatchNormalization()(x)
-    gru_1 = KL.CuDNNGRU(128, return_sequences=False, name='gru1')(x)
-    gru_1b = KL.CuDNNGRU(128, return_sequences=False, go_backwards=True, name='gru1_b')(x)
+    gru_1 = KL.GRU(128, return_sequences=False, name='gru1')(x)
+    gru_1b = KL.GRU(128, return_sequences=False, go_backwards=True, name='gru1_b')(x)
+    x = KL.Concatenate(axis=-1)([gru_1, gru_1b])
     # Final
-    x = KL.Concatenate()([gru_1, gru_1b])
     x = KL.BatchNormalization()(x)
-    x = KL.Activation("relu")(x)
+    x = KL.Dense(1024, activation='relu')(x)
     x = KL.Dense(100, activation='softmax',name="output")(x)
     model = Model(img_input, outputs=x)
     return model
