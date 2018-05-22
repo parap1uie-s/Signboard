@@ -1,14 +1,14 @@
 from Model import *
 from Utils import DataGen
 from keras.optimizers import *
-from keras.callbacks import EarlyStopping,ModelCheckpoint,ReduceLROnPlateau
+from keras.callbacks import EarlyStopping,ModelCheckpoint
 from keras.preprocessing.image import ImageDataGenerator
 import os
 
 if __name__ == '__main__':
     datapath = "/home/Signboard/datasets"
     shape = 224
-    modelType = 'xeception'
+    modelType = 'xception'
 
     if modelType == "densenet":
         model = DenseNetTransfer((shape,shape,3))
@@ -16,8 +16,9 @@ if __name__ == '__main__':
         model = Transfer((shape,shape,3))
     elif modelType == "Resnet":
         model = ResNet((shape,shape,3))
-    elif modelType == "xeception":
+    elif modelType == "xception":
         model = XceptionTransfer((shape,shape,3))
+        model.load_weights("/home/professorsfx/.keras/models/xception_weights_tf_dim_ordering_tf_kernels_notop.h5", by_name=True, skip_mismatch=True)
     
     optimizer = SGD(lr=0.001, clipnorm=5.0, momentum=0.9, decay=1e-5)
     model.compile(optimizer=optimizer, loss="sparse_categorical_crossentropy", metrics=['acc'])
@@ -28,8 +29,7 @@ if __name__ == '__main__':
         # model.load_weights("/home/professorsfx/.keras/models/resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5", by_name=True, skip_mismatch=True)
 
     callbacks = [EarlyStopping(monitor='val_loss', min_delta=0.01, patience=10, verbose=0, mode='auto'), 
-    ModelCheckpoint("Transfer.h5", monitor='val_loss', verbose=0, save_best_only=True, save_weights_only=True, mode='auto', period=1),
-    ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=5, min_lr=10e-7, min_delta=0.01, verbose=1)]
+    ModelCheckpoint("Transfer.h5", monitor='val_loss', verbose=0, save_best_only=True, save_weights_only=True, mode='auto', period=1)]
 
     train_datagen = ImageDataGenerator(
         shear_range=0.2,
@@ -39,7 +39,7 @@ if __name__ == '__main__':
         width_shift_range=0.2,
         height_shift_range=0.2,
         horizontal_flip=True,
-        # vertical_flip=True,
+        vertical_flip=True,
         fill_mode="nearest",
         rescale=1.0/255.0)
 
