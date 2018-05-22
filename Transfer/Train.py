@@ -1,5 +1,4 @@
 from Model import *
-from Utils import DataGen
 from keras.optimizers import *
 from keras.callbacks import EarlyStopping,ModelCheckpoint
 from keras.preprocessing.image import ImageDataGenerator
@@ -8,7 +7,7 @@ import os
 if __name__ == '__main__':
     datapath = "/home/Signboard/datasets"
     shape = 224
-    modelType = 'xception'
+    modelType = 'densenet'
 
     if modelType == "densenet":
         model = DenseNetTransfer((shape,shape,3))
@@ -18,7 +17,7 @@ if __name__ == '__main__':
         model = ResNet((shape,shape,3))
     elif modelType == "xception":
         model = XceptionTransfer((shape,shape,3))
-        model.load_weights("/home/professorsfx/.keras/models/xception_weights_tf_dim_ordering_tf_kernels_notop.h5", by_name=True, skip_mismatch=True)
+        # model.load_weights("/home/professorsfx/.keras/models/xception_weights_tf_dim_ordering_tf_kernels_notop.h5", by_name=True, skip_mismatch=True)
     
     optimizer = SGD(lr=0.001, clipnorm=5.0, momentum=0.9, decay=1e-5)
     model.compile(optimizer=optimizer, loss="sparse_categorical_crossentropy", metrics=['acc'])
@@ -38,8 +37,8 @@ if __name__ == '__main__':
         # channel_shift_range=20,
         width_shift_range=0.2,
         height_shift_range=0.2,
-        horizontal_flip=True,
-        vertical_flip=True,
+        # horizontal_flip=True,
+        # vertical_flip=True,
         fill_mode="nearest",
         rescale=1.0/255.0)
 

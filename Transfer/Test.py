@@ -10,7 +10,7 @@ if __name__ == '__main__':
     datapath = "/home/Signboard/datasets"
     shape = 224
 
-    modelType = 'xception'
+    modelType = 'densenet'
 
     if modelType == "densenet":
         model = DenseNetTransfer((shape,shape,3))

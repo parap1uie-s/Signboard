@@ -23,10 +23,10 @@ def Transfer(input_shape):
 
 def XceptionTransfer(input_shape):
     input_tensor = KL.Input((input_shape))
-    gray_tensor = RGB2GrayLayer()(input_tensor) # 224,224,1
-    x = KL.Concatenate(axis=-1)([input_tensor, gray_tensor]) # 224,224,4
+    # gray_tensor = RGB2GrayLayer()(input_tensor) # 224,224,1
+    # x = KL.Concatenate(axis=-1)([input_tensor, gray_tensor]) # 224,224,4
 
-    baseModel = Xception(include_top=False, weights=None, input_tensor=x, pooling="avg")
+    baseModel = Xception(include_top=False, weights="imagenet", input_tensor=input_tensor, pooling="avg")
     x = baseModel.output
     x = KL.Dense(1024, activation='relu')(x)
     x = KL.Dropout(0.3)(x)
@@ -36,10 +36,10 @@ def XceptionTransfer(input_shape):
 
 def DenseNetTransfer(input_shape):
     input_tensor = KL.Input((input_shape))
-    gray_tensor = RGB2GrayLayer()(input_tensor) # 224,224,1
-    x = KL.Concatenate(axis=-1)([input_tensor, gray_tensor]) # 224,224,4
+    # gray_tensor = RGB2GrayLayer()(input_tensor) # 224,224,1
+    # x = KL.Concatenate(axis=-1)([input_tensor, gray_tensor]) # 224,224,4
 
-    baseModel = DenseNet201(include_top=False, weights=None, input_tensor=x, pooling="avg")
+    baseModel = DenseNet201(include_top=False, weights="imagenet", input_tensor=input_tensor, pooling="avg")
     x = baseModel.output
     x = KL.Dense(1024, activation='relu')(x)
     x = KL.Dropout(0.3)(x)
