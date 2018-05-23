@@ -13,7 +13,7 @@ def Transfer(input_shape):
     gray_tensor = RGB2GrayLayer()(input_tensor) # 224,224,1
     x = KL.Concatenate(axis=-1)([input_tensor, gray_tensor]) # 224,224,4
 
-    baseModel = InceptionResNetV2(include_top=False, weights=None, input_tensor=x, pooling="avg")
+    baseModel = InceptionResNetV2(include_top=False, weights=None, input_tensor=input_tensor, pooling="avg")
     x = baseModel.output
     x = KL.Dense(1024, activation='relu')(x)
     x = KL.Dropout(0.3)(x)

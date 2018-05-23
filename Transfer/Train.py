@@ -24,8 +24,8 @@ if __name__ == '__main__':
 
     if os.path.exists("Transfer.h5"):
         model.load_weights("Transfer.h5", by_name=True, skip_mismatch=True)
-    else:
-        model.load_weights("/home/professorsfx/.keras/models/resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5", by_name=True, skip_mismatch=True)
+    # else:
+    #     model.load_weights("/home/professorsfx/.keras/models/resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5", by_name=True, skip_mismatch=True)
 
     callbacks = [EarlyStopping(monitor='val_loss', min_delta=0.01, patience=10, verbose=0, mode='auto'), 
     ModelCheckpoint("Transfer.h5", monitor='val_loss', verbose=0, save_best_only=True, save_weights_only=True, mode='auto', period=1)]
