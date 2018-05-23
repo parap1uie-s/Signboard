@@ -81,14 +81,11 @@ def ResNet(input_shape,architecture='resnet50'):
     x = identity_block(x, 3, [256, 256, 256], stage=5, block='b')
     x = identity_block(x, 3, [256, 256, 256], stage=5, block='c')
     x = STN_block(x,5)
-    # Stage 6
-    x = conv_block(x, 3, [256, 256, 256], stage=6, block='a', strides=(1, 1))
-    x = identity_block(x, 3, [256, 256, 256], stage=6, block='b')
-    x = identity_block(x, 3, [256, 256, 256], stage=6, block='c')
 
     # Final
     x = KL.GlobalAveragePooling2D()(x)
-    x = KL.Dense(1000, activation='relu')(x)
+    x = KL.Dense(1024, activation='relu')(x)
+    x = KL.Dropout(0.3)(x)
     x = KL.Dense(100, activation='softmax', name='output')(x)
     model = Model(input_tensor, outputs=x)
     return model

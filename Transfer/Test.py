@@ -10,7 +10,7 @@ if __name__ == '__main__':
     datapath = "/home/Signboard/datasets"
     shape = 224
 
-    modelType = 'densenet'
+    modelType = 'InceptionResNetV2'
 
     if modelType == "densenet":
         model = DenseNetTransfer((shape,shape,3))
@@ -28,35 +28,35 @@ if __name__ == '__main__':
     class_indices = dict((v,k) for k,v in class_indices.items())
     result = {}
 
-    # gen = TestDataGen(datapath, shape)
-    # while True:
-    #     try:
-    #         Img, filepath = next(gen)
-    #         res = model.predict(Img)
-    #         res = np.argmax(res, axis=1)
-    #         for k,f in enumerate(filepath):
-    #             result[f.split("/")[-1]] = class_indices[res[k]]
-    #     except Exception as e:
-    #         print(e)
-    #         break
+    gen = TestDataGen(datapath, shape)
+    while True:
+        try:
+            Img, filepath = next(gen)
+            res = model.predict(Img)
+            res = np.argmax(res, axis=1)
+            for k,f in enumerate(filepath):
+                result[f.split("/")[-1]] = class_indices[res[k]]
+        except Exception as e:
+            print(e)
+            break
 
-    test_datagen = ImageDataGenerator(rescale=1.0/255.0)
-    test_generator = test_datagen.flow_from_directory(
-            os.path.join(datapath, "test_new"),
-            target_size=(224, 224),
-            shuffle = False,
-            class_mode=None,
-            batch_size=1,
-            follow_links=True)
+    # test_datagen = ImageDataGenerator(rescale=1.0/255.0)
+    # test_generator = test_datagen.flow_from_directory(
+    #         os.path.join(datapath, "test_new"),
+    #         target_size=(shape, shape),
+    #         shuffle = False,
+    #         class_mode=None,
+    #         batch_size=1,
+    #         follow_links=True)
 
-    filenames = test_generator.filenames
-    nb_samples = len(filenames)
+    # filenames = test_generator.filenames
+    # nb_samples = len(filenames)
 
-    res = model.predict_generator(test_generator,steps = nb_samples)
-    res = np.argmax(res, axis=1)
+    # res = model.predict_generator(test_generator,steps = nb_samples)
+    # res = np.argmax(res, axis=1)
 
-    for k,file in enumerate(filenames):
-        result[file.split("/")[1]] = class_indices[res[k]]
+    # for k,file in enumerate(filenames):
+    #     result[file.split("/")[1]] = class_indices[res[k]]
 
     pred_result = pd.DataFrame.from_dict(result,orient='index').reset_index()
     pred_result.columns = ['filepath', 'classid']

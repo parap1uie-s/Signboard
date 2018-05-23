@@ -5,37 +5,6 @@ import os,shutil
 from keras.preprocessing.image import ImageDataGenerator
 import random
 
-def DataGen(datapath, shape, batch_size=32, phase='train'):
-    assert phase in ['train','val']
-    if phase == 'train':
-        csv_handle = pd.read_csv(os.path.join(datapath, "train_split.txt"), sep=' ', names=['filepath', 'classid'],dtype={"filepath":"str", "classid":"str"})
-    else:
-        csv_handle = pd.read_csv(os.path.join(datapath, "val_split.txt"), sep=' ', names=['filepath', 'classid'],dtype={"filepath":"str", "classid":"str"})
-
-    data_num = len(csv_handle)
-
-    while True:
-        x = []
-        y = []
-        ind = np.random.choice(data_num, batch_size, replace=False)
-        choiced_data = csv_handle.iloc[ind,:]
-        for row in choiced_data.iterrows():
-            r = row[1]
-            Img = Image.open(os.path.join(datapath, phase, r['classid'], r['filepath'])).resize((shape,shape),Image.ANTIALIAS)
-
-            # aug =  random.randint(0,2)
-            # # 水平翻转
-            # if aug == 1:
-            #     Img = Img.transpose(Image.FLIP_LEFT_RIGHT)
-            # elif aug == 2:
-            #     Img = Img.transpose(Image.FLIP_TOP_BOTTOM)
-            x.append(np.array(Img))
-            y.append(int(r['classid'])-1)
-
-        x = np.array(x) / 255.0
-        y = np.array(y)
-        yield x, y
-
 def TestDataGen(datapath, shape, batch_size=32):
     csv_handle = pd.read_csv(os.path.join(datapath, "test.txt"), sep=' ', names=['filepath'],dtype={"filepath":"str"})
 
@@ -51,12 +20,12 @@ def TestDataGen(datapath, shape, batch_size=32):
             r = row[1]
             Img = Image.open(os.path.join(datapath, 'test', r['filepath'])).resize((shape,shape),Image.ANTIALIAS)
 
-            aug =  random.randint(0,2)
-            # 水平翻转
-            if aug == 1:
-                Img = Img.transpose(Image.FLIP_LEFT_RIGHT)
-            elif aug == 2:
-                Img = Img.transpose(Image.FLIP_TOP_BOTTOM)
+            # aug =  random.randint(0,2)
+            # # 水平翻转
+            # if aug == 1:
+            #     Img = Img.transpose(Image.FLIP_LEFT_RIGHT)
+            # elif aug == 2:
+            #     Img = Img.transpose(Image.FLIP_TOP_BOTTOM)
             x.append(np.array(Img))
             y.append(r['filepath'])
 
