@@ -1,6 +1,8 @@
 from keras.models import *
 from keras.layers import *
 from keras.regularizers import l2
+import tensorflow as tf
+from keras.engine.topology import Layer
 
 def AttentionResNet92(shape=(224, 224, 3), n_channels=64, n_classes=100,
                       dropout=0, regularization=0.01):
@@ -49,9 +51,11 @@ def AttentionResNet56(shape=(224, 224, 3), n_channels=64, n_classes=100,
     """
 
     regularizer = l2(regularization)
+    input_tensor = Input((shape))
+    gray_tensor = RGB2GrayLayer()(input_tensor) # 224,224,1
+    x = Concatenate(axis=-1)([input_tensor, gray_tensor]) # 224,224,4
 
-    input_ = Input(shape=shape)
-    x = Conv2D(n_channels, (7, 7), strides=(2, 2), padding='same')(input_) # 112x112
+    x = Conv2D(n_channels, (7, 7), strides=(2, 2), padding='same')(x) # 112x112
     x = BatchNormalization()(x)
     x = Activation('relu')(x)
     x = MaxPool2D(pool_size=(3, 3), strides=(2, 2), padding='same')(x)  # 56x56
@@ -70,12 +74,11 @@ def AttentionResNet56(shape=(224, 224, 3), n_channels=64, n_classes=100,
     x = residual_block(x, output_channels=n_channels * 32)
 
     x = GlobalAveragePooling2D()(x)
-    if dropout:
-        x = Dropout(dropout)(x)
     x = Dense(1024, activation='relu')(x)
+    x = Dropout(0.3)(x)
     output = Dense(n_classes, kernel_regularizer=regularizer, activation='softmax')(x)
 
-    model = Model(input_, output)
+    model = Model(input_tensor, output)
     return model
 
 def residual_block(input, input_channels=None, output_channels=None, kernel_size=(3, 3), stride=1):
@@ -182,3 +185,15 @@ def attention_block(input, input_channels=None, output_channels=None, encoder_de
         output = residual_block(output)
 
     return output
+
+
+class RGB2GrayLayer(Layer):
+
+    def __init__(self, **kwargs):
+        super(RGB2GrayLayer, self).__init__(**kwargs)
+
+    def call(self, x):
+        return tf.image.rgb_to_grayscale(x)
+
+    def compute_output_shape(self, input_shape):
+        return (input_shape[0], input_shape[1], input_shape[2], 1)
