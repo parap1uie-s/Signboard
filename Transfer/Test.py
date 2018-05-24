@@ -9,9 +9,8 @@ from keras.preprocessing.image import ImageDataGenerator
 if __name__ == '__main__':
     datapath = "/home/Signboard/datasets"
     shape = 224
-
-    modelType = 'InceptionResNetV2'
-
+    
+    modelType = 'inception'
     if modelType == "densenet":
         model = DenseNetTransfer((shape,shape,3))
     elif modelType == "InceptionResNetV2":
@@ -20,6 +19,8 @@ if __name__ == '__main__':
         model = ResNet((shape,shape,3))
     elif modelType == "xception":
         model = XceptionTransfer((shape,shape,3))
+    elif modelType == "inception":
+        model = InceptionTransfer((shape,shape,3), channel=3)
         
     model.load_weights("Transfer.h5", by_name=True)
 

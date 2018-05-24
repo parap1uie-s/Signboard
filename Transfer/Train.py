@@ -7,7 +7,7 @@ import os
 if __name__ == '__main__':
     datapath = "/home/Signboard/datasets"
     shape = 224
-    modelType = 'InceptionResNetV2'
+    modelType = 'inception'
 
     if modelType == "densenet":
         model = DenseNetTransfer((shape,shape,3))
@@ -17,8 +17,9 @@ if __name__ == '__main__':
         model = ResNet((shape,shape,3))
     elif modelType == "xception":
         model = XceptionTransfer((shape,shape,3))
-        # model.load_weights("/home/professorsfx/.keras/models/xception_weights_tf_dim_ordering_tf_kernels_notop.h5", by_name=True, skip_mismatch=True)
-    
+    elif modelType == "inception":
+        model = InceptionTransfer((shape,shape,3), channel=3)
+
     optimizer = SGD(lr=0.001, clipnorm=5.0, momentum=0.9, decay=1e-5)
     model.compile(optimizer=optimizer, loss="sparse_categorical_crossentropy", metrics=['acc'])
 
