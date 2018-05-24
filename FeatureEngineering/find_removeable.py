@@ -9,6 +9,8 @@ def MergeResult(Submission_path):
     true_label = pd.read_csv("test_groundtruth.csv", sep=' ', names=['id', 'label_true'])
 
     for fileList in itertools.combinations(fileLists, 2):
+        if fileList[0].split(".")[-1] != "csv" or fileList[1].split(".")[-1] != "csv":
+            continue
         # 统计每一行次数出现最多的数字
         result_handle_1 = pd.read_csv(os.path.join(Submission_path,fileList[0]),sep=' ',names=['id','label_1'])
         result_handle_2 = pd.read_csv(os.path.join(Submission_path,fileList[1]),sep=' ',names=['id','label_2'])

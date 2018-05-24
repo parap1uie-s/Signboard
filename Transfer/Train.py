@@ -7,7 +7,7 @@ import os
 if __name__ == '__main__':
     datapath = "/home/Signboard/datasets"
     shape = 224
-    modelType = 'inception'
+    modelType = 'xception'
 
     if modelType == "densenet":
         model = DenseNetTransfer((shape,shape,3))
@@ -16,7 +16,7 @@ if __name__ == '__main__':
     elif modelType == "Resnet":
         model = ResNet((shape,shape,3))
     elif modelType == "xception":
-        model = XceptionTransfer((shape,shape,3))
+        model = XceptionTransfer((shape,shape,3), channel=3)
     elif modelType == "inception":
         model = InceptionTransfer((shape,shape,3), channel=3)
 
@@ -25,8 +25,6 @@ if __name__ == '__main__':
 
     if os.path.exists("Transfer.h5"):
         model.load_weights("Transfer.h5", by_name=True, skip_mismatch=True)
-    # else:
-    #     model.load_weights("/home/professorsfx/.keras/models/resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5", by_name=True, skip_mismatch=True)
 
     callbacks = [EarlyStopping(monitor='val_loss', min_delta=0.01, patience=10, verbose=0, mode='auto'), 
     ModelCheckpoint("Transfer.h5", monitor='val_loss', verbose=0, save_best_only=True, save_weights_only=True, mode='auto', period=1)]
@@ -69,3 +67,26 @@ if __name__ == '__main__':
         validation_steps=len(validation_generator)+1,
         callbacks=callbacks)
     
+    # if modelType == "densenet":
+    #     model = DenseNetTransfer((shape,shape,3),channel=4)
+    # elif modelType == "InceptionResNetV2":
+    #     model = Transfer((shape,shape,3),channel=4)
+    # elif modelType == "Resnet":
+    #     model = ResNet((shape,shape,3), channel=4)
+    # elif modelType == "xception":
+    #     model = XceptionTransfer((shape,shape,3), channel=4)
+    # elif modelType == "inception":
+    #     model = InceptionTransfer((shape,shape,3), channel=4)
+
+    # model.compile(optimizer=optimizer, loss="sparse_categorical_crossentropy", metrics=['acc'])
+    # model.load_weights("Transfer.h5", by_name=True, skip_mismatch=True)
+    # model.fit_generator(
+    #     train_generator,
+    #     steps_per_epoch=len(train_generator)+1, 
+    #     epochs=100, 
+    #     use_multiprocessing=True,
+    #     max_queue_size=100,
+    #     workers=4,
+    #     validation_data=validation_generator,
+    #     validation_steps=len(validation_generator)+1,
+    #     callbacks=callbacks)
