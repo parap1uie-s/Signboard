@@ -7,27 +7,29 @@ import os
 if __name__ == '__main__':
     datapath = "/home/Signboard/datasets"
     shape = 224
-    modelType = 'xception'
+    modelType = 'nas'
 
     if modelType == "densenet":
-        model = DenseNetTransfer((shape,shape,3))
+        model = DenseNetTransfer((shape,shape,3), channel=3)
     elif modelType == "InceptionResNetV2":
-        model = Transfer((shape,shape,3))
+        model = Transfer((shape,shape,3), channel=3)
     elif modelType == "Resnet":
-        model = ResNet((shape,shape,3))
+        model = ResNet((shape,shape,3), channel=3)
     elif modelType == "xception":
         model = XceptionTransfer((shape,shape,3), channel=3)
     elif modelType == "inception":
         model = InceptionTransfer((shape,shape,3), channel=3)
+    elif modelType == "nas":
+        model = NASTransfer((shape,shape,3), channel=3)
 
     optimizer = SGD(lr=0.001, clipnorm=5.0, momentum=0.9, decay=1e-5)
     model.compile(optimizer=optimizer, loss="sparse_categorical_crossentropy", metrics=['acc'])
 
-    if os.path.exists("Transfer.h5"):
-        model.load_weights("Transfer.h5", by_name=True, skip_mismatch=True)
+    if os.path.exists("Transfer-{}.h5".format(modelType)):
+        model.load_weights("Transfer-{}.h5".format(modelType), by_name=True, skip_mismatch=True)
 
     callbacks = [EarlyStopping(monitor='val_loss', min_delta=0.01, patience=10, verbose=0, mode='auto'), 
-    ModelCheckpoint("Transfer.h5", monitor='val_loss', verbose=0, save_best_only=True, save_weights_only=True, mode='auto', period=1)]
+    ModelCheckpoint("Transfer-{}.h5".format(modelType), monitor='val_loss', verbose=0, save_best_only=True, save_weights_only=True, mode='auto', period=1)]
 
     train_datagen = ImageDataGenerator(
         shear_range=0.2,
@@ -46,7 +48,7 @@ if __name__ == '__main__':
     train_generator = train_datagen.flow_from_directory(
             os.path.join(datapath, "train"),
             target_size=(shape, shape),
-            batch_size=4,
+            batch_size=8,
             class_mode='sparse',
             shuffle = True)
 
