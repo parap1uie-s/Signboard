@@ -1,13 +1,13 @@
 from Model import *
 from keras.optimizers import *
-from keras.callbacks import EarlyStopping,ModelCheckpoint
+from keras.callbacks import EarlyStopping,ModelCheckpoint,ReduceLROnPlateau
 from keras.preprocessing.image import ImageDataGenerator
 import os
 
 if __name__ == '__main__':
     datapath = "/home/Signboard/datasets"
     shape = 224
-    modelType = 'nas'
+    modelType = 'Resnet'
 
     if modelType == "densenet":
         model = DenseNetTransfer((shape,shape,3), channel=3)
@@ -15,6 +15,7 @@ if __name__ == '__main__':
         model = Transfer((shape,shape,3), channel=3)
     elif modelType == "Resnet":
         model = ResNet((shape,shape,3), channel=3)
+        model.load_weights("/home/professorsfx/.keras/models/resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5", by_name=True, skip_mismatch=True)
     elif modelType == "xception":
         model = XceptionTransfer((shape,shape,3), channel=3)
     elif modelType == "inception":
@@ -28,7 +29,8 @@ if __name__ == '__main__':
     if os.path.exists("Transfer-{}.h5".format(modelType)):
         model.load_weights("Transfer-{}.h5".format(modelType), by_name=True, skip_mismatch=True)
 
-    callbacks = [EarlyStopping(monitor='val_loss', min_delta=0.01, patience=10, verbose=0, mode='auto'), 
+    callbacks = [EarlyStopping(monitor='val_loss', min_delta=0.01, patience=10, verbose=0, mode='auto'),
+    ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=5, verbose=1, mode='auto', epsilon=0.001, min_lr=0),
     ModelCheckpoint("Transfer-{}.h5".format(modelType), monitor='val_loss', verbose=0, save_best_only=True, save_weights_only=True, mode='auto', period=1)]
 
     train_datagen = ImageDataGenerator(
