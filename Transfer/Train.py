@@ -3,35 +3,45 @@ from keras.optimizers import *
 from keras.callbacks import EarlyStopping,ModelCheckpoint,ReduceLROnPlateau
 from keras.preprocessing.image import ImageDataGenerator
 import os
+import argparse
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--modelType', required=True)
+    parser.add_argument('--channel', required=False, default=3)
+    args = parser.parse_args()
+
+    assert args.modelType in ["densenet", "InceptionResNetV2", "Resnet", "xception", "inception", "nas"]
+    assert args.channel.isdigit()
+    args.channel = int(args.channel)
+
     datapath = "/home/Signboard/datasets"
     shape = 224
-    modelType = 'Resnet'
-
-    if modelType == "densenet":
-        model = DenseNetTransfer((shape,shape,3), channel=3)
-    elif modelType == "InceptionResNetV2":
-        model = Transfer((shape,shape,3), channel=3)
-    elif modelType == "Resnet":
-        model = ResNet((shape,shape,3), channel=3)
+    
+    if args.modelType == "densenet":
+        model = DenseNetTransfer((shape,shape,3), channel=args.channel)
+    elif args.modelType == "InceptionResNetV2":
+        model = Transfer((shape,shape,3), channel=args.channel)
+    elif args.modelType == "Resnet":
+        model = ResNet((shape,shape,3), channel=args.channel)
         model.load_weights("/home/professorsfx/.keras/models/resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5", by_name=True, skip_mismatch=True)
-    elif modelType == "xception":
-        model = XceptionTransfer((shape,shape,3), channel=3)
-    elif modelType == "inception":
-        model = InceptionTransfer((shape,shape,3), channel=3)
-    elif modelType == "nas":
-        model = NASTransfer((shape,shape,3), channel=3)
+    elif args.modelType == "xception":
+        model = XceptionTransfer((shape,shape,3), channel=args.channel)
+    elif args.modelType == "inception":
+        model = InceptionTransfer((shape,shape,3), channel=args.channel)
+    elif args.modelType == "nas":
+        model = NASTransfer((shape,shape,3), channel=args.channel)
 
     optimizer = SGD(lr=0.001, clipnorm=5.0, momentum=0.9, decay=1e-5)
     model.compile(optimizer=optimizer, loss="sparse_categorical_crossentropy", metrics=['acc'])
 
-    if os.path.exists("Transfer-{}.h5".format(modelType)):
-        model.load_weights("Transfer-{}.h5".format(modelType), by_name=True, skip_mismatch=True)
+    if os.path.exists("Transfer-{}.h5".format(args.modelType)):
+        model.load_weights("Transfer-{}.h5".format(args.modelType), by_name=True, skip_mismatch=True)
 
     callbacks = [EarlyStopping(monitor='val_loss', min_delta=0.01, patience=10, verbose=0, mode='auto'),
-    ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=5, verbose=1, mode='auto', epsilon=0.001, min_lr=0),
-    ModelCheckpoint("Transfer-{}.h5".format(modelType), monitor='val_loss', verbose=0, save_best_only=True, save_weights_only=True, mode='auto', period=1)]
+    ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=5, verbose=1, mode='auto', min_delta=0.001, min_lr=0),
+    ModelCheckpoint("Transfer-{}.h5".format(args.modelType), monitor='val_loss', verbose=0, save_best_only=True, save_weights_only=True, mode='auto', period=1)]
 
     train_datagen = ImageDataGenerator(
         shear_range=0.2,
@@ -50,7 +60,7 @@ if __name__ == '__main__':
     train_generator = train_datagen.flow_from_directory(
             os.path.join(datapath, "train"),
             target_size=(shape, shape),
-            batch_size=8,
+            batch_size=4,
             class_mode='sparse',
             shuffle = True)
 
@@ -70,27 +80,3 @@ if __name__ == '__main__':
         validation_data=validation_generator,
         validation_steps=len(validation_generator)+1,
         callbacks=callbacks)
-    
-    # if modelType == "densenet":
-    #     model = DenseNetTransfer((shape,shape,3),channel=4)
-    # elif modelType == "InceptionResNetV2":
-    #     model = Transfer((shape,shape,3),channel=4)
-    # elif modelType == "Resnet":
-    #     model = ResNet((shape,shape,3), channel=4)
-    # elif modelType == "xception":
-    #     model = XceptionTransfer((shape,shape,3), channel=4)
-    # elif modelType == "inception":
-    #     model = InceptionTransfer((shape,shape,3), channel=4)
-
-    # model.compile(optimizer=optimizer, loss="sparse_categorical_crossentropy", metrics=['acc'])
-    # model.load_weights("Transfer.h5", by_name=True, skip_mismatch=True)
-    # model.fit_generator(
-    #     train_generator,
-    #     steps_per_epoch=len(train_generator)+1, 
-    #     epochs=100, 
-    #     use_multiprocessing=True,
-    #     max_queue_size=100,
-    #     workers=4,
-    #     validation_data=validation_generator,
-    #     validation_steps=len(validation_generator)+1,
-    #     callbacks=callbacks)
