@@ -40,7 +40,7 @@ if __name__ == '__main__':
 
     class_indices = dict((v,k) for k,v in class_indices.items())
     result = {}
-
+    
     gen = TestDataGen(datapath, shape)
     while True:
         try:
