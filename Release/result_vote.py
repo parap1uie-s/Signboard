@@ -48,7 +48,7 @@ def MergeResult(Submission_path):
 
     #生成csv文件
     sub = pd.DataFrame({'id': img_id, 'lable': vote_label})
-    sub.to_csv("result_vote.csv".format(acc), index=False, header=False, sep=' ')
+    sub.to_csv("result_vote.csv", index=False, header=False, sep=' ')
 
 if __name__ == '__main__':
     Submission_path = "Submission/"
