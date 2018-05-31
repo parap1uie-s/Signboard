@@ -9,7 +9,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--modelType', required=True)
-    parser.add_argument('--channel', required=False, default=3)
+    parser.add_argument('--channel', required=False, default="3")
     args = parser.parse_args()
 
     assert args.modelType in ["densenet", "InceptionResNetV2", "Resnet", "xception", "inception", "nas"]
