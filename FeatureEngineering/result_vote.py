@@ -67,8 +67,10 @@ def MergeResult(Submission_path):
     # 0995
     # fileLists = ['result-0988-densenet_4c_aug.csv', 'result-0935-CRNN.csv', 'result-0992_vote.csv', 'result-0962-nasnet_4c_aug.csv', 'result-0994_vote.csv']
     # 0996
-    fileLists = ['result-0979-densenet_dataaug.csv', 'result-0988-densenet_4c_aug.csv', 'result-0975-inception_resv2_4c_aug.csv', 'result-0993_vote.csv', 
-    'result-0982-densenet_5c_aug.csv', 'result-0972-densenet_4c.csv', 'result-0995_vote.csv']
+    # fileLists = ['result-0979-densenet_dataaug.csv', 'result-0988-densenet_4c_aug.csv', 'result-0975-inception_resv2_4c_aug.csv', 'result-0993_vote.csv', 
+    # 'result-0982-densenet_5c_aug.csv', 'result-0972-densenet_4c.csv', 'result-0995_vote.csv']
+    # 0997
+    fileLists = ['result-0988-densenet_5c_aug.csv', 'result-0982-densenet_5c_aug.csv', 'result-0996_vote.csv', 'result-0995_vote.csv', 'result-0979-densenet_4c_aug.csv']
 
     read_img_id = False
     for result in fileLists:
