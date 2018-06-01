@@ -18,6 +18,12 @@ def NASTransfer(input_shape, channel=3):
         gray_tensor = RGB2GrayLayer()(input_tensor) # 224,224,1
         x = KL.Concatenate(axis=-1)([input_tensor, gray_tensor]) # 224,224,4
         baseModel = NASNetMobile(include_top=False, weights=None, input_tensor=x, pooling="avg")
+    elif channel == 5:
+        gray_tensor = RGB2GrayLayer()(input_tensor) # 224,224,1
+        sobel_tensor = Gray2SobelEdgeLayer()(gray_tensor) # 224,224,1
+        sobel_tensor = KL.BatchNormalization(name="sobelBN")(sobel_tensor)
+        x = KL.Concatenate(axis=-1)([input_tensor, gray_tensor, sobel_tensor]) # 224,224,5
+        baseModel = NASNetMobile(include_top=False, weights=None, input_tensor=x, pooling="avg")
 
     x = baseModel.output
     x = KL.Dense(1024, activation='relu')(x)
@@ -33,6 +39,12 @@ def InceptionTransfer(input_shape, channel=3):
     elif channel == 4:
         gray_tensor = RGB2GrayLayer()(input_tensor) # 224,224,1
         x = KL.Concatenate(axis=-1)([input_tensor, gray_tensor]) # 224,224,4
+        baseModel = InceptionV3(include_top=False, weights=None, input_tensor=x, pooling="avg")
+    elif channel == 5:
+        gray_tensor = RGB2GrayLayer()(input_tensor) # 224,224,1
+        sobel_tensor = Gray2SobelEdgeLayer()(gray_tensor) # 224,224,1
+        sobel_tensor = KL.BatchNormalization(name="sobelBN")(sobel_tensor)
+        x = KL.Concatenate(axis=-1)([input_tensor, gray_tensor, sobel_tensor]) # 224,224,5
         baseModel = InceptionV3(include_top=False, weights=None, input_tensor=x, pooling="avg")
 
     x = baseModel.output
@@ -50,6 +62,12 @@ def Transfer(input_shape, channel=3):
         gray_tensor = RGB2GrayLayer()(input_tensor) # 224,224,1
         x = KL.Concatenate(axis=-1)([input_tensor, gray_tensor]) # 224,224,4
         baseModel = InceptionResNetV2(include_top=False, weights=None, input_tensor=x, pooling="avg")
+    elif channel == 5:
+        gray_tensor = RGB2GrayLayer()(input_tensor) # 224,224,1
+        sobel_tensor = Gray2SobelEdgeLayer()(gray_tensor) # 224,224,1
+        sobel_tensor = KL.BatchNormalization(name="sobelBN")(sobel_tensor)
+        x = KL.Concatenate(axis=-1)([input_tensor, gray_tensor, sobel_tensor]) # 224,224,5
+        baseModel = InceptionResNetV2(include_top=False, weights=None, input_tensor=x, pooling="avg")
 
     x = baseModel.output
     x = KL.Dense(1024, activation='relu')(x)
@@ -65,6 +83,12 @@ def XceptionTransfer(input_shape, channel=3):
     elif channel == 4:
         gray_tensor = RGB2GrayLayer()(input_tensor) # 224,224,1
         x = KL.Concatenate(axis=-1)([input_tensor, gray_tensor]) # 224,224,4
+        baseModel = Xception(include_top=False, weights=None, input_tensor=x, pooling="avg")
+    elif channel == 5:
+        gray_tensor = RGB2GrayLayer()(input_tensor) # 224,224,1
+        sobel_tensor = Gray2SobelEdgeLayer()(gray_tensor) # 224,224,1
+        sobel_tensor = KL.BatchNormalization(name="sobelBN")(sobel_tensor)
+        x = KL.Concatenate(axis=-1)([input_tensor, gray_tensor, sobel_tensor]) # 224,224,5
         baseModel = Xception(include_top=False, weights=None, input_tensor=x, pooling="avg")
 
     x = baseModel.output
@@ -85,7 +109,11 @@ def DenseNetTransfer(input_shape, channel=3):
     elif channel == 5:
         gray_tensor = RGB2GrayLayer()(input_tensor) # 224,224,1
         sobel_tensor = Gray2SobelEdgeLayer()(gray_tensor) # 224,224,1
+<<<<<<< HEAD
         sobel_tensor = KL.BatchNormalization()(sobel_tensor)
+=======
+        sobel_tensor = KL.BatchNormalization(name="sobelBN")(sobel_tensor)
+>>>>>>> 03bb5c2ef3a6792b4bef21b1402b296e010b3f68
         x = KL.Concatenate(axis=-1)([input_tensor, gray_tensor, sobel_tensor]) # 224,224,5
         baseModel = DenseNet201(include_top=False, weights=None, input_tensor=x, pooling="avg")
 
