@@ -40,30 +40,7 @@ if __name__ == '__main__':
 
     class_indices = dict((v,k) for k,v in class_indices.items())
     result = {}
-<<<<<<< HEAD
-    """
-    gen = TestDataGen(datapath, shape)
-    while True:
-        try:
-            Img, filepath = next(gen)
-            res = model.predict(Img)
-            res = np.argmax(res, axis=1)
-            for k,f in enumerate(filepath):
-                result[f.split("/")[-1]] = class_indices[res[k]]
-        except Exception as e:
-            print(e)
-            break
-    """
-    test_datagen = ImageDataGenerator(rescale=1.0/255.0)
-    test_generator = test_datagen.flow_from_directory(
-            os.path.join(datapath, "test_new"),
-            target_size=(shape, shape),
-            shuffle = False,
-            class_mode=None,
-            batch_size=1,
-            follow_links=True)
 
-=======
 
     # gen = TestDataGen(datapath, shape)
     # while True:
@@ -86,7 +63,6 @@ if __name__ == '__main__':
             batch_size=1,
             follow_links=True)
 
->>>>>>> 03bb5c2ef3a6792b4bef21b1402b296e010b3f68
     filenames = test_generator.filenames
     nb_samples = len(filenames)
 

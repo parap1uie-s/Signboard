@@ -21,8 +21,9 @@ def NASTransfer(input_shape, channel=3):
     elif channel == 5:
         gray_tensor = RGB2GrayLayer()(input_tensor) # 224,224,1
         sobel_tensor = Gray2SobelEdgeLayer()(gray_tensor) # 224,224,1
-        sobel_tensor = KL.BatchNormalization(name="sobelBN")(sobel_tensor)
+        sobel_tensor = KL.Conv2D(1,(14,14), padding="same", name="sobelCONV")(sobel_tensor)
         x = KL.Concatenate(axis=-1)([input_tensor, gray_tensor, sobel_tensor]) # 224,224,5
+        x = ChannelVoteBlock(x)
         baseModel = NASNetMobile(include_top=False, weights=None, input_tensor=x, pooling="avg")
 
     x = baseModel.output
@@ -43,8 +44,9 @@ def InceptionTransfer(input_shape, channel=3):
     elif channel == 5:
         gray_tensor = RGB2GrayLayer()(input_tensor) # 224,224,1
         sobel_tensor = Gray2SobelEdgeLayer()(gray_tensor) # 224,224,1
-        sobel_tensor = KL.BatchNormalization(name="sobelBN")(sobel_tensor)
+        sobel_tensor = KL.Conv2D(1,(14,14), padding="same", name="sobelCONV")(sobel_tensor)
         x = KL.Concatenate(axis=-1)([input_tensor, gray_tensor, sobel_tensor]) # 224,224,5
+        x = ChannelVoteBlock(x)
         baseModel = InceptionV3(include_top=False, weights=None, input_tensor=x, pooling="avg")
 
     x = baseModel.output
@@ -65,8 +67,9 @@ def Transfer(input_shape, channel=3):
     elif channel == 5:
         gray_tensor = RGB2GrayLayer()(input_tensor) # 224,224,1
         sobel_tensor = Gray2SobelEdgeLayer()(gray_tensor) # 224,224,1
-        sobel_tensor = KL.BatchNormalization(name="sobelBN")(sobel_tensor)
+        sobel_tensor = KL.Conv2D(1,(14,14), padding="same", name="sobelCONV")(sobel_tensor)
         x = KL.Concatenate(axis=-1)([input_tensor, gray_tensor, sobel_tensor]) # 224,224,5
+        x = ChannelVoteBlock(x)
         baseModel = InceptionResNetV2(include_top=False, weights=None, input_tensor=x, pooling="avg")
 
     x = baseModel.output
@@ -87,8 +90,9 @@ def XceptionTransfer(input_shape, channel=3):
     elif channel == 5:
         gray_tensor = RGB2GrayLayer()(input_tensor) # 224,224,1
         sobel_tensor = Gray2SobelEdgeLayer()(gray_tensor) # 224,224,1
-        sobel_tensor = KL.BatchNormalization(name="sobelBN")(sobel_tensor)
+        sobel_tensor = KL.Conv2D(1,(14,14), padding="same", name="sobelCONV")(sobel_tensor)
         x = KL.Concatenate(axis=-1)([input_tensor, gray_tensor, sobel_tensor]) # 224,224,5
+        x = ChannelVoteBlock(x)
         baseModel = Xception(include_top=False, weights=None, input_tensor=x, pooling="avg")
 
     x = baseModel.output
@@ -109,12 +113,9 @@ def DenseNetTransfer(input_shape, channel=3):
     elif channel == 5:
         gray_tensor = RGB2GrayLayer()(input_tensor) # 224,224,1
         sobel_tensor = Gray2SobelEdgeLayer()(gray_tensor) # 224,224,1
-<<<<<<< HEAD
-        sobel_tensor = KL.BatchNormalization()(sobel_tensor)
-=======
-        sobel_tensor = KL.BatchNormalization(name="sobelBN")(sobel_tensor)
->>>>>>> 03bb5c2ef3a6792b4bef21b1402b296e010b3f68
+        sobel_tensor = KL.Conv2D(1,(14,14), padding="same", name="sobelCONV")(sobel_tensor)
         x = KL.Concatenate(axis=-1)([input_tensor, gray_tensor, sobel_tensor]) # 224,224,5
+        x = ChannelVoteBlock(x)
         baseModel = DenseNet201(include_top=False, weights=None, input_tensor=x, pooling="avg")
 
     x = baseModel.output
@@ -298,11 +299,25 @@ class Gray2SobelEdgeLayer(Layer):
 
     def call(self, grayImg):
         w = tf.image.sobel_edges(grayImg)
-        dy = w[...,0,0]
-        dx = w[...,0,1]
-        res = tf.expand_dims( tf.sqrt( tf.pow(dy, 2) + tf.pow(dx, 2) ), -1)
+        res = tf.sqrt( tf.pow(w[...,0,0], 2) + tf.pow(w[...,0,1], 2) )
+
+        # min_by_batch = tf.expand_dims(tf.expand_dims(tf.reduce_min(tf.reduce_min(res, axis=1),axis=1), axis=-1),axis=-1)
+        # max_by_batch = tf.expand_dims(tf.expand_dims(tf.reduce_max(tf.reduce_max(res, axis=1),axis=1), axis=-1),axis=-1)
+
+        # res = (res - min_by_batch) / (max_by_batch - min_by_batch)
+        res = tf.expand_dims(res, -1)
+        res = tf.sigmoid(res)
         return res
 
     def compute_output_shape(self, input_shape):
         return (input_shape[0], input_shape[1], input_shape[2], 1)
-        
+
+def ChannelVoteBlock(input_tensor):
+    filters = int(input_tensor.get_shape()[-1])
+    se_shape = (1, 1, filters)
+    x = KL.GlobalAveragePooling2D()(input_tensor)
+    x = KL.Reshape(se_shape)(x)
+    x = KL.Dense(filters, activation='relu',kernel_initializer='he_normal',use_bias=False, name='channel_vote_dense1')(x)
+    x = KL.Dense(filters, activation='sigmoid',kernel_initializer='he_normal',use_bias=False, name='channel_vote_dense2')(x)
+    x = KL.Multiply()([input_tensor, x])
+    return x
