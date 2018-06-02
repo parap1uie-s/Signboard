@@ -17,21 +17,22 @@ if __name__ == '__main__':
     args.channel = int(args.channel)
 
     datapath = "/home/Signboard/datasets"
-    shape = 224
+    width = 224
+    height = 112
     
     if args.modelType == "densenet":
-        model = DenseNetTransfer((shape,shape,3), channel=args.channel)
+        model = DenseNetTransfer((height,width,3), channel=args.channel)
     elif args.modelType == "InceptionResNetV2":
-        model = Transfer((shape,shape,3), channel=args.channel)
+        model = Transfer((height,width,3), channel=args.channel)
     elif args.modelType == "Resnet":
-        model = ResNet((shape,shape,3), channel=args.channel)
+        model = ResNet((height,width,3), channel=args.channel)
         model.load_weights("/home/professorsfx/.keras/models/resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5", by_name=True, skip_mismatch=True)
     elif args.modelType == "xception":
-        model = XceptionTransfer((shape,shape,3), channel=args.channel)
+        model = XceptionTransfer((height,width,3), channel=args.channel)
     elif args.modelType == "inception":
-        model = InceptionTransfer((shape,shape,3), channel=args.channel)
+        model = InceptionTransfer((height,width,3), channel=args.channel)
     elif args.modelType == "nas":
-        model = NASTransfer((shape,shape,3), channel=args.channel)
+        model = NASTransfer((height,width,3), channel=args.channel)
 
     optimizer = SGD(lr=0.001, clipnorm=5.0, momentum=0.9, decay=1e-5)
     model.compile(optimizer=optimizer, loss="sparse_categorical_crossentropy", metrics=['acc'])
@@ -47,7 +48,7 @@ if __name__ == '__main__':
         shear_range=0.2,
         zoom_range=0.3,
         rotation_range=20,
-        # channel_shift_range=20,
+        channel_shift_range=20,
         width_shift_range=0.2,
         height_shift_range=0.2,
         # horizontal_flip=True,
@@ -59,14 +60,14 @@ if __name__ == '__main__':
 
     train_generator = train_datagen.flow_from_directory(
             os.path.join(datapath, "train"),
-            target_size=(shape, shape),
+            target_size=(height, width),
             batch_size=4,
             class_mode='sparse',
             shuffle = True)
 
     validation_generator = val_datagen.flow_from_directory(
             os.path.join(datapath, "val"),
-            target_size=(shape, shape),
+            target_size=(height, width),
             batch_size=32,
             class_mode='sparse',
             shuffle = True)

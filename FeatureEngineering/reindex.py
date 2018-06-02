@@ -6,7 +6,7 @@ def equal(a, b):
     return int(a) == int(b)
 
 if __name__ == '__main__':
-    Submission_path = "../Submission"
+    Submission_path = "../FeatureEngineering"
     test_truth = "test_groundtruth.csv"
 
     gt_result = pd.read_csv(test_truth , sep=' ', names=['filepath', 'classid_true'],
@@ -15,6 +15,8 @@ if __name__ == '__main__':
     fileLists = os.listdir(Submission_path)
     for file in fileLists:
         if file.split(".")[-1] != "csv":
+            continue
+        if file == test_truth:
             continue
         result_handle = pd.read_csv(os.path.join(Submission_path,file),sep=' ',names=['filepath','classid_pred'], 
             dtype={"filepath":"str", "classid_pred":"int"})

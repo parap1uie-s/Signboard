@@ -21,8 +21,8 @@ def NASTransfer(input_shape, channel=3):
     elif channel == 5:
         gray_tensor = RGB2GrayLayer()(input_tensor) # 224,224,1
         sobel_tensor = Gray2SobelEdgeLayer()(gray_tensor) # 224,224,1
-        sobel_tensor = KL.Conv2D(1,(14,14), padding="same", name="sobelCONV")(sobel_tensor)
-        x = KL.Concatenate(axis=-1)([input_tensor, gray_tensor, sobel_tensor]) # 224,224,5
+        sobel_tensor = KL.Conv2D(64,(14,14), padding="same", name="sobelCONV")(sobel_tensor)
+        x = KL.Concatenate(axis=-1)([input_tensor, gray_tensor, sobel_tensor]) # 224,224,4+64
         x = ChannelVoteBlock(x)
         baseModel = NASNetMobile(include_top=False, weights=None, input_tensor=x, pooling="avg")
 
@@ -44,8 +44,8 @@ def InceptionTransfer(input_shape, channel=3):
     elif channel == 5:
         gray_tensor = RGB2GrayLayer()(input_tensor) # 224,224,1
         sobel_tensor = Gray2SobelEdgeLayer()(gray_tensor) # 224,224,1
-        sobel_tensor = KL.Conv2D(1,(14,14), padding="same", name="sobelCONV")(sobel_tensor)
-        x = KL.Concatenate(axis=-1)([input_tensor, gray_tensor, sobel_tensor]) # 224,224,5
+        sobel_tensor = KL.Conv2D(64,(14,14), padding="same", name="sobelCONV")(sobel_tensor)
+        x = KL.Concatenate(axis=-1)([input_tensor, gray_tensor, sobel_tensor]) # 224,224,4+64
         x = ChannelVoteBlock(x)
         baseModel = InceptionV3(include_top=False, weights=None, input_tensor=x, pooling="avg")
 
@@ -67,8 +67,8 @@ def Transfer(input_shape, channel=3):
     elif channel == 5:
         gray_tensor = RGB2GrayLayer()(input_tensor) # 224,224,1
         sobel_tensor = Gray2SobelEdgeLayer()(gray_tensor) # 224,224,1
-        sobel_tensor = KL.Conv2D(1,(14,14), padding="same", name="sobelCONV")(sobel_tensor)
-        x = KL.Concatenate(axis=-1)([input_tensor, gray_tensor, sobel_tensor]) # 224,224,5
+        sobel_tensor = KL.Conv2D(64,(14,14), padding="same", name="sobelCONV")(sobel_tensor)
+        x = KL.Concatenate(axis=-1)([input_tensor, gray_tensor, sobel_tensor]) # 224,224,4+64
         x = ChannelVoteBlock(x)
         baseModel = InceptionResNetV2(include_top=False, weights=None, input_tensor=x, pooling="avg")
 
@@ -90,8 +90,8 @@ def XceptionTransfer(input_shape, channel=3):
     elif channel == 5:
         gray_tensor = RGB2GrayLayer()(input_tensor) # 224,224,1
         sobel_tensor = Gray2SobelEdgeLayer()(gray_tensor) # 224,224,1
-        sobel_tensor = KL.Conv2D(1,(14,14), padding="same", name="sobelCONV")(sobel_tensor)
-        x = KL.Concatenate(axis=-1)([input_tensor, gray_tensor, sobel_tensor]) # 224,224,5
+        sobel_tensor = KL.Conv2D(64,(14,14), padding="same", name="sobelCONV")(sobel_tensor)
+        x = KL.Concatenate(axis=-1)([input_tensor, gray_tensor, sobel_tensor]) # 224,224,4+64
         x = ChannelVoteBlock(x)
         baseModel = Xception(include_top=False, weights=None, input_tensor=x, pooling="avg")
 
@@ -113,8 +113,8 @@ def DenseNetTransfer(input_shape, channel=3):
     elif channel == 5:
         gray_tensor = RGB2GrayLayer()(input_tensor) # 224,224,1
         sobel_tensor = Gray2SobelEdgeLayer()(gray_tensor) # 224,224,1
-        sobel_tensor = KL.Conv2D(1,(14,14), padding="same", name="sobelCONV")(sobel_tensor)
-        x = KL.Concatenate(axis=-1)([input_tensor, gray_tensor, sobel_tensor]) # 224,224,5
+        sobel_tensor = KL.Conv2D(64,(14,14), padding="same", name="sobelCONV")(sobel_tensor)
+        x = KL.Concatenate(axis=-1)([input_tensor, gray_tensor, sobel_tensor]) # 224,224,4+64
         x = ChannelVoteBlock(x)
         baseModel = DenseNet201(include_top=False, weights=None, input_tensor=x, pooling="avg")
 

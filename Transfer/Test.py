@@ -9,7 +9,8 @@ import argparse
 
 if __name__ == '__main__':
     datapath = "/home/Signboard/datasets"
-    shape = 224
+    width = 224
+    height = 112
     
     parser = argparse.ArgumentParser()
 
@@ -22,17 +23,17 @@ if __name__ == '__main__':
     args.channel = int(args.channel)
 
     if args.modelType == "densenet":
-        model = DenseNetTransfer((shape,shape,3), channel=args.channel)
+        model = DenseNetTransfer((height,width,3), channel=args.channel)
     elif args.modelType == "InceptionResNetV2":
-        model = Transfer((shape,shape,3), channel=args.channel)
+        model = Transfer((height,width,3), channel=args.channel)
     elif args.modelType == "Resnet":
-        model = ResNet((shape,shape,3), channel=args.channel)
+        model = ResNet((height,width,3), channel=args.channel)
     elif args.modelType == "xception":
-        model = XceptionTransfer((shape,shape,3), channel=args.channel)
+        model = XceptionTransfer((height,width,3), channel=args.channel)
     elif args.modelType == "inception":
-        model = InceptionTransfer((shape,shape,3), channel=args.channel)
+        model = InceptionTransfer((height,width,3), channel=args.channel)
     elif args.modelType == "nas":
-        model = NASTransfer((shape,shape,3), channel=args.channel)
+        model = NASTransfer((height,width,3), channel=args.channel)
         
     model.load_weights("Transfer-{}.h5".format(args.modelType), by_name=True)
 
@@ -57,7 +58,7 @@ if __name__ == '__main__':
     test_datagen = ImageDataGenerator(rescale=1.0/255.0)
     test_generator = test_datagen.flow_from_directory(
             os.path.join(datapath, "test_new"),
-            target_size=(shape, shape),
+            target_size=(height, width),
             shuffle = False,
             class_mode=None,
             batch_size=1,
