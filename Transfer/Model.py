@@ -121,7 +121,8 @@ def DenseNetTransfer(input_shape, channel=3):
     x = baseModel.output
     x = KL.Dense(1024, activation='relu')(x)
     x = KL.Dropout(0.3)(x)
-    x = KL.Dense(100, activation='softmax', name='output')(x)
+    # x = KL.Dense(100, activation='softmax', name='output')(x)
+    x = KL.Dense(100, name='output')(x)
     model = Model(input_tensor, outputs=x)
     return model
 

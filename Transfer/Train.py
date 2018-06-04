@@ -1,4 +1,5 @@
 from Model import *
+from Losses import categorical_crossentropy_with_smooth
 from keras.optimizers import *
 from keras.callbacks import EarlyStopping,ModelCheckpoint,ReduceLROnPlateau
 from keras.preprocessing.image import ImageDataGenerator
@@ -35,7 +36,8 @@ if __name__ == '__main__':
         model = NASTransfer((height,width,3), channel=args.channel)
 
     optimizer = SGD(lr=0.001, clipnorm=5.0, momentum=0.9, decay=1e-5)
-    model.compile(optimizer=optimizer, loss="sparse_categorical_crossentropy", metrics=['acc'])
+    # model.compile(optimizer=optimizer, loss="sparse_categorical_crossentropy", metrics=['acc'])
+    model.compile(optimizer=optimizer, loss=categorical_crossentropy_with_smooth, metrics=['acc'])
 
     if os.path.exists("Transfer-{}.h5".format(args.modelType)):
         model.load_weights("Transfer-{}.h5".format(args.modelType), by_name=True, skip_mismatch=True)
@@ -62,14 +64,14 @@ if __name__ == '__main__':
             os.path.join(datapath, "train"),
             target_size=(height, width),
             batch_size=4,
-            class_mode='sparse',
+            class_mode='categorical',
             shuffle = True)
 
     validation_generator = val_datagen.flow_from_directory(
             os.path.join(datapath, "val"),
             target_size=(height, width),
             batch_size=32,
-            class_mode='sparse',
+            class_mode='categorical',
             shuffle = True)
     model.fit_generator(
         train_generator,
@@ -77,7 +79,7 @@ if __name__ == '__main__':
         epochs=100, 
         use_multiprocessing=True,
         max_queue_size=100,
-        workers=4,
+        workers=8,
         validation_data=validation_generator,
         validation_steps=len(validation_generator)+1,
         callbacks=callbacks)
