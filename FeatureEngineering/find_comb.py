@@ -4,10 +4,10 @@ import os
 import itertools
 from multiprocessing import Process
 
-def pro_do(fileLists, true_label, labels, ind):
+def pro_do(fileLists, true_label, labels, i):
     bestAcc = 0
     bestComb = []
-    for fileList in itertools.combinations(range(0,len(fileLists)), ind):
+    for fileList in itertools.combinations(range(0,len(fileLists)), i):
         # 统计每一行次数出现最多的数字
         vote_label = []
         for value in labels[:,fileList]:

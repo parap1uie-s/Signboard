@@ -9,8 +9,8 @@ import argparse
 
 if __name__ == '__main__':
     datapath = "/home/Signboard/datasets"
-    width = 224
-    height = 112
+    width = 448
+    height = 448
     
     parser = argparse.ArgumentParser()
 
@@ -43,7 +43,7 @@ if __name__ == '__main__':
     result = {}
 
 
-    # gen = TestDataGen(datapath, shape)
+    # gen = TestDataGen(datapath, height, width)
     # while True:
     #     try:
     #         Img, filepath = next(gen)

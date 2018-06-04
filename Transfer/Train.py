@@ -18,8 +18,8 @@ if __name__ == '__main__':
     args.channel = int(args.channel)
 
     datapath = "/home/Signboard/datasets"
-    width = 224
-    height = 112
+    width = 448
+    height = 448
     
     if args.modelType == "densenet":
         model = DenseNetTransfer((height,width,3), channel=args.channel)
@@ -50,7 +50,7 @@ if __name__ == '__main__':
         shear_range=0.2,
         zoom_range=0.3,
         rotation_range=20,
-        channel_shift_range=20,
+        # channel_shift_range=20,
         width_shift_range=0.2,
         height_shift_range=0.2,
         # horizontal_flip=True,
@@ -79,7 +79,7 @@ if __name__ == '__main__':
         epochs=100, 
         use_multiprocessing=True,
         max_queue_size=100,
-        workers=8,
+        workers=4,
         validation_data=validation_generator,
         validation_steps=len(validation_generator)+1,
         callbacks=callbacks)
