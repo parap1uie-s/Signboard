@@ -61,7 +61,7 @@ if __name__ == '__main__':
         shear_range=0.2,
         zoom_range=0.3,
         rotation_range=20,
-        # channel_shift_range=20,
+        channel_shift_range=20,
         width_shift_range=0.2,
         height_shift_range=0.2,
         # horizontal_flip=True,
