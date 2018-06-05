@@ -10,7 +10,7 @@ from keras.applications.xception import Xception
 from keras.applications.inception_v3 import InceptionV3
 from keras.applications.nasnet import NASNetMobile
 
-def NASTransfer(input_shape, channel=3):
+def NASTransfer(input_shape, channel=3, final_activation='softmax'):
     input_tensor = KL.Input((input_shape))
     if channel == 3:
         baseModel = NASNetMobile(include_top=False, weights="imagenet", input_tensor=input_tensor, pooling="avg")
@@ -29,12 +29,11 @@ def NASTransfer(input_shape, channel=3):
     x = baseModel.output
     x = KL.Dense(1024, activation='relu')(x)
     x = KL.Dropout(0.3)(x)
-    # x = KL.Dense(100, activation='softmax', name='output')(x)
-    x = KL.Dense(100, name='output')(x)
+    x = KL.Dense(100, activation=final_activation, name='output')(x)
     model = Model(input_tensor, outputs=x)
     return model
 
-def InceptionTransfer(input_shape, channel=3):
+def InceptionTransfer(input_shape, channel=3, final_activation='softmax'):
     input_tensor = KL.Input((input_shape))
     if channel == 3:
         baseModel = InceptionV3(include_top=False, weights="imagenet", input_tensor=input_tensor, pooling="avg")
@@ -53,11 +52,11 @@ def InceptionTransfer(input_shape, channel=3):
     x = baseModel.output
     x = KL.Dense(1024, activation='relu')(x)
     x = KL.Dropout(0.3)(x)
-    x = KL.Dense(100, activation='softmax', name='output')(x)
+    x = KL.Dense(100, activation=final_activation, name='output')(x)
     model = Model(input_tensor, outputs=x)
     return model
 
-def Transfer(input_shape, channel=3):
+def Transfer(input_shape, channel=3, final_activation='softmax'):
     input_tensor = KL.Input((input_shape))
     if channel == 3:
         baseModel = InceptionResNetV2(include_top=False, weights="imagenet", input_tensor=input_tensor, pooling="avg")
@@ -76,11 +75,11 @@ def Transfer(input_shape, channel=3):
     x = baseModel.output
     x = KL.Dense(1024, activation='relu')(x)
     x = KL.Dropout(0.3)(x)
-    x = KL.Dense(100, activation='softmax', name='output')(x)
+    x = KL.Dense(100, activation=final_activation, name='output')(x)
     model = Model(input_tensor, outputs=x)
     return model
 
-def XceptionTransfer(input_shape, channel=3):
+def XceptionTransfer(input_shape, channel=3, final_activation='softmax'):
     input_tensor = KL.Input((input_shape))
     if channel == 3:
         baseModel = Xception(include_top=False, weights="imagenet", input_tensor=input_tensor, pooling="avg")
@@ -99,11 +98,12 @@ def XceptionTransfer(input_shape, channel=3):
     x = baseModel.output
     x = KL.Dense(1024, activation='relu')(x)
     x = KL.Dropout(0.3)(x)
-    x = KL.Dense(100, activation='softmax', name='output')(x)
+    x = KL.Dense(100, activation=final_activation, name='output')(x)
     model = Model(input_tensor, outputs=x)
     return model
 
-def DenseNetTransfer(input_shape, channel=3):
+def DenseNetTransfer(input_shape, channel=3, final_activation='softmax'):
+    assert final_activation in ['softmax', 'linear']
     input_tensor = KL.Input((input_shape))
     if channel == 3:
         baseModel = DenseNet201(include_top=False, weights="imagenet", input_tensor=input_tensor, pooling="avg")
@@ -122,8 +122,7 @@ def DenseNetTransfer(input_shape, channel=3):
     x = baseModel.output
     x = KL.Dense(1024, activation='relu')(x)
     x = KL.Dropout(0.3)(x)
-    # x = KL.Dense(100, activation='softmax', name='output')(x)
-    x = KL.Dense(100, name='output')(x)
+    x = KL.Dense(100, activation=final_activation, name='output')(x)
     model = Model(input_tensor, outputs=x)
     return model
 
@@ -141,35 +140,35 @@ def ResNet(input_shape,architecture='resnet50', channel=3):
     x = BatchNorm(axis=3, name='bn_conv1')(x)
     x = KL.Activation('relu')(x)
     x = KL.MaxPooling2D((3, 3), strides=(2, 2), padding="same")(x)
-    # x = STN_block(x,1)
+    x = STN_block(x,1)
     # Stage 2
     x = conv_block(x, 3, [64, 64, 256], stage=2, block='a', strides=(1, 1))
     x = identity_block(x, 3, [64, 64, 256], stage=2, block='b')
     x = identity_block(x, 3, [64, 64, 256], stage=2, block='c')
-    # x = STN_block(x,2)
+    x = STN_block(x,2)
     # Stage 3
     x = conv_block(x, 3, [128, 128, 512], stage=3, block='a')
     x = identity_block(x, 3, [128, 128, 512], stage=3, block='b')
     x = identity_block(x, 3, [128, 128, 512], stage=3, block='c')
     x = identity_block(x, 3, [128, 128, 512], stage=3, block='d')
-    # x = STN_block(x,3)
+    x = STN_block(x,3)
     # Stage 4
     x = conv_block(x, 3, [256, 256, 1024], stage=4, block='a')
     block_count = {"resnet50": 5, "resnet101": 22}[architecture]
     for i in range(block_count):
         x = identity_block(x, 3, [256, 256, 1024], stage=4, block=chr(98 + i))
-    # x = STN_block(x,4)
+    x = STN_block(x,4)
     # Stage 5
     x = conv_block(x, 3, [256, 256, 256], stage=5, block='a', strides=(1, 1))
     x = identity_block(x, 3, [256, 256, 256], stage=5, block='b')
     x = identity_block(x, 3, [256, 256, 256], stage=5, block='c')
-    # x = STN_block(x,5)
+    x = STN_block(x,5)
 
     # Final
     x = KL.GlobalAveragePooling2D()(x)
     x = KL.Dense(1024, activation='relu')(x)
     x = KL.Dropout(0.3)(x)
-    x = KL.Dense(100, activation='softmax', name='output')(x)
+    x = KL.Dense(100, activation=final_activation, name='output')(x)
     model = Model(input_tensor, outputs=x)
     return model
 

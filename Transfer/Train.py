@@ -11,10 +11,18 @@ if __name__ == '__main__':
 
     parser.add_argument('--modelType', required=True)
     parser.add_argument('--channel', required=False, default="3")
+    parser.add_argument('--loss', required=False, default="cc")
     args = parser.parse_args()
 
     assert args.modelType in ["densenet", "InceptionResNetV2", "Resnet", "xception", "inception", "nas"]
     assert args.channel.isdigit()
+    # categorical_crossentropy or with smooth
+    assert args.loss in ['cc', 'ccs']
+    if args.loss == "cc":
+        activation='softmax'
+    else:
+        activation='linear'
+
     args.channel = int(args.channel)
 
     datapath = "/home/Signboard/datasets"
@@ -22,22 +30,25 @@ if __name__ == '__main__':
     height = 448
     
     if args.modelType == "densenet":
-        model = DenseNetTransfer((height,width,3), channel=args.channel)
+        model = DenseNetTransfer((height,width,3), channel=args.channel, final_activation=activation)
     elif args.modelType == "InceptionResNetV2":
-        model = Transfer((height,width,3), channel=args.channel)
+        model = Transfer((height,width,3), channel=args.channel, final_activation=activation)
     elif args.modelType == "Resnet":
-        model = ResNet((height,width,3), channel=args.channel)
+        model = ResNet((height,width,3), channel=args.channel, final_activation=activation)
         model.load_weights("/home/professorsfx/.keras/models/resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5", by_name=True, skip_mismatch=True)
     elif args.modelType == "xception":
-        model = XceptionTransfer((height,width,3), channel=args.channel)
+        model = XceptionTransfer((height,width,3), channel=args.channel, final_activation=activation)
     elif args.modelType == "inception":
-        model = InceptionTransfer((height,width,3), channel=args.channel)
+        model = InceptionTransfer((height,width,3), channel=args.channel, final_activation=activation)
     elif args.modelType == "nas":
-        model = NASTransfer((height,width,3), channel=args.channel)
+        model = NASTransfer((height,width,3), channel=args.channel, final_activation=activation)
 
     optimizer = SGD(lr=0.001, clipnorm=5.0, momentum=0.9, decay=1e-5)
-    # model.compile(optimizer=optimizer, loss="sparse_categorical_crossentropy", metrics=['acc'])
-    model.compile(optimizer=optimizer, loss=categorical_crossentropy_with_smooth, metrics=['acc'])
+
+    if args.loss == "cc":
+        model.compile(optimizer=optimizer, loss="categorical_crossentropy", metrics=['acc'])
+    else:
+        model.compile(optimizer=optimizer, loss=categorical_crossentropy_with_smooth, metrics=['acc'])
 
     if os.path.exists("Transfer-{}.h5".format(args.modelType)):
         model.load_weights("Transfer-{}.h5".format(args.modelType), by_name=True, skip_mismatch=True)
