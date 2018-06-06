@@ -60,8 +60,8 @@ if __name__ == '__main__':
     train_datagen = ImageDataGenerator(
         shear_range=0.2,
         zoom_range=0.3,
-        rotation_range=20,
-        channel_shift_range=20,
+        rotation_range=40,
+        # channel_shift_range=20,
         width_shift_range=0.2,
         height_shift_range=0.2,
         # horizontal_flip=True,
@@ -74,23 +74,23 @@ if __name__ == '__main__':
     train_generator = train_datagen.flow_from_directory(
             os.path.join(datapath, "train"),
             target_size=(height, width),
-            batch_size=4,
+            batch_size=2,
             class_mode='categorical',
             shuffle = True)
 
     validation_generator = val_datagen.flow_from_directory(
-            os.path.join(datapath, "val"),
+            os.path.join(datapath, "test_labeld"),
             target_size=(height, width),
             batch_size=32,
             class_mode='categorical',
             shuffle = True)
     model.fit_generator(
         train_generator,
-        steps_per_epoch=len(train_generator)+1, 
+        steps_per_epoch=len(train_generator), 
         epochs=100, 
         use_multiprocessing=True,
         max_queue_size=100,
         workers=4,
         validation_data=validation_generator,
-        validation_steps=len(validation_generator)+1,
+        validation_steps=len(validation_generator),
         callbacks=callbacks)
