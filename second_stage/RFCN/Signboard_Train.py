@@ -124,6 +124,7 @@ if __name__ == '__main__':
         if model_path is not None:
             model.load_weights(model_path, by_name=True)
     except Exception as e:
+        print(e)
         print("No checkpoint founded")
         
     # *** This training schedule is an example. Update to your needs ***
