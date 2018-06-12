@@ -342,14 +342,14 @@ class BaseModel(object):
         for image in images:
             # Resize image to fit the model expected size
             # TODO: move resizing to mold_image()
-            molded_image, window, scale, padding = Utils.resize_image(
+            molded_image, window, scale, padding = KerasRFCN.Utils.resize_image(
                 image,
                 min_dim=self.config.IMAGE_MIN_DIM,
                 max_dim=self.config.IMAGE_MAX_DIM,
                 padding=self.config.IMAGE_PADDING)
-            molded_image = Utils.mold_image(molded_image, self.config)
+            molded_image = KerasRFCN.Utils.mold_image(molded_image, self.config)
             # Build image_meta
-            image_meta = Utils.compose_image_meta(
+            image_meta = KerasRFCN.Utils.compose_image_meta(
                 0, image.shape, window,
                 np.zeros([self.config.NUM_CLASSES], dtype=np.int32))
             # Append

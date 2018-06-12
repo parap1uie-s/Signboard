@@ -12,7 +12,7 @@ http://mmlab.ie.cuhk.edu.hk/projects/DeepFashion.html
 
 from KerasRFCN.Model.Model import RFCN_Model
 from KerasRFCN.Config import Config
-import KerasRFCN.Utils 
+from KerasRFCN.Utils import Dataset
 import os
 from keras.preprocessing import image
 import pickle
@@ -27,7 +27,7 @@ class RFCNNConfig(Config):
     to the toy shapes dataset.
     """
     # Give the configuration a recognizable name
-    NAME = "Fashion"
+    NAME = "Signboard"
 
     # Train on 1 GPU and 8 images per GPU. We can put multiple images on each
     # GPU because the images are small. Batch size is 8 (GPUs * images/GPU).
@@ -35,29 +35,20 @@ class RFCNNConfig(Config):
     IMAGES_PER_GPU = 1
 
     # Number of classes (including background)
-    C = 1 + 46  # background + 2 tags
+    C = 1 + 60  # background + 2 tags
     NUM_CLASSES = C
     # Use small images for faster training. Set the limits of the small side
     # the large side, and that determines the image shape.
-    IMAGE_MIN_DIM = 300
-    IMAGE_MAX_DIM = 512
+    IMAGE_MIN_DIM = 600
+    IMAGE_MAX_DIM = 800
 
     # Use smaller anchors because our image and objects are small
-    RPN_ANCHOR_SCALES = (32, 64, 128, 256, 512)  # anchor side in pixels
+    RPN_ANCHOR_SCALES = (16, 32, 64, 128, 256)  # anchor side in pixels
+    BACKBONE_STRIDES = [4, 8, 16, 16, 16]
 
-    # Reduce training ROIs per image because the images are small and have
-    # few objects. Aim to allow ROI sampling to pick 33% positive ROIs.
-    TRAIN_ROIS_PER_IMAGE = 200
+    RPN_NMS_THRESHOLD = 0.8
 
-    # Use a small epoch since the data is simple
-    STEPS_PER_EPOCH = 100
-
-    # use small validation steps since the epoch is small
-    VALIDATION_STEPS = 5
-
-    RPN_NMS_THRESHOLD = 0.7
-
-    DETECTION_MIN_CONFIDENCE = 0.4
+    DETECTION_MIN_CONFIDENCE = 0.8
     POOL_SIZE = 7
 
 

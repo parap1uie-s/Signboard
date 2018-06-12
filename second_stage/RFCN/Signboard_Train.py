@@ -17,8 +17,6 @@ import os
 import pickle as pk
 import numpy as np
 from PIL import Image
-import pandas as pd
-from sklearn.model_selection import train_test_split
 
 ############################################################
 #  Config
@@ -42,8 +40,8 @@ class RFCNNConfig(Config):
     NUM_CLASSES = C
     # Use small images for faster training. Set the limits of the small side
     # the large side, and that determines the image shape.
-    IMAGE_MIN_DIM = 300
-    IMAGE_MAX_DIM = 512
+    IMAGE_MIN_DIM = 600
+    IMAGE_MAX_DIM = 800
 
     # Use smaller anchors because our image and objects are small
     RPN_ANCHOR_SCALES = (16, 32, 64, 128, 256)  # anchor side in pixels
@@ -58,7 +56,7 @@ class RFCNNConfig(Config):
     # use small validation steps since the epoch is small
     VALIDATION_STEPS = 200
 
-    RPN_NMS_THRESHOLD = 0.6
+    RPN_NMS_THRESHOLD = 0.8
     POOL_SIZE = 7
 
 ############################################################
