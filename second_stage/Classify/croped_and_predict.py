@@ -2,22 +2,26 @@ import numpy as np
 from PIL import Image
 import os
 from Model import *
+import pandas as pd
 
-# filepath - str - 绝对路径 - /home/xxx/xxx/xxx/3801213fb80e7bec39113f26262eb9389a506b29.jpg
-# bboxes - list - 二维list或tuple - [ [x1, y1, x2, y2], [x1, y1, x2, y2], [x1, y1, x2, y2] ]
-# nparray - bool - 返回shape为[len(bboxes), 224,224,3]的数组，或返回一组PIL.Image对象
-
-def crop_image(filepath, bboxes, nparray=False):
+def crop_image(filepath, box, nparray=False):
     res = []
-    for box in bboxes:
-        assert len(box) == 4
-        x1, y1, x2, y2 = box
-        res.append( Image.open(filepath).crop((x1,y1,x2,y2)).resize((224,224), Image.ANTIALIAS) )
+    assert len(box) == 4
+    x1, y1, x2, y2 = box
+    x1, y1, x2, y2 = round(x1), round(y1), round(x2), round(y2)
+    res = Image.open(filepath).crop((x1,y1,x2,y2)).resize((224,224), Image.ANTIALIAS)
     if nparray:
-        res = np.array( list(map(lambda x:np.array(x),res)) )
+        # res = np.array( list(map(lambda x:np.array(x),res)) )
+        res = np.array(res)
     return res
 
-# def predict(model, croped_images):
+def crop_image_generator(rootpath, filepaths, all_image_bboxes):
+    i = 0
+    while i < len(filepaths):
+        croped_images = crop_image(os.path.join(rootpath, filepaths[i]), all_image_bboxes[i], nparray=True)
+        croped_images = np.expand_dims(croped_images,axis=0) / 255.0
+        i += 1
+        yield croped_images
 
 
 def classify_main(rootpath, filepaths, all_image_bboxes):
@@ -26,33 +30,36 @@ def classify_main(rootpath, filepaths, all_image_bboxes):
 
     model = DenseNetTransfer((224,224,3), channel=4)
     model.load_weights("Transfer-densenet.h5", by_name=True)
-
-    ret = []
-    for k,filepath in enumerate(filepaths):
-        assert os.path.isfile( os.path.join(rootpath, filepath) ), "Wrong filepath, file not founded"
-        croped_images = crop_image(os.path.join(rootpath, filepath), all_image_bboxes[k], nparray=True)
+    handle = open("temp.txt", "w+")
+    # ret = []
+    gen = crop_image_generator(rootpath, filepaths, all_image_bboxes)
         # 像素值归一化
-        croped_images = croped_images / 255.0
-        predict_res = model.predict(croped_images)
-        label = np.argmax(predict_res, axis=1)
-        label = [ class_indices[l] for l in label ]
-        score = np.max(predict_res, axis=1)
+    predict_res = model.predict_generator(gen, steps=len(filepaths), use_multiprocessing=True, max_queue_size=100)
+    label = np.argmax(predict_res, axis=1)
+    label = [ class_indices[l] for l in label ]
+    score = np.max(predict_res, axis=1)
 
-        for i in range(len(label)):
-            ret.append( (filepath, label[i], score[i]) )
-    return ret
+    for k,l in enumerate(label):
+        # if l == "0":
+        #     continue
+        handle.write("{} {} {}\n".format(filepaths[k], l, score[k]) )
+    # return ret
 
 if __name__ == '__main__':
-    # 3801213fb80e7bec63750acd232eb9389b506b6a.jpg 19 657 420 754 567
-    # 3801213fb80e7bec63750acd232eb9389b506b6a.jpg 19 278 309 582 497
-    # 3801213fb80e7bec451d52cb252eb9389a506bd0.jpg 6 320 286 590 594
-    # 3801213fb80e7bec451d52cb252eb9389a506bd0.jpg 6 803 553 904 731
-    all_image_bboxes = [ [[657,420,754,567], [278,309,582,497]], [[320,286,590,594], [803,553,904,731]] ]
-    # 到包含着test图片的文件夹
-    # filepath 只对应文件名，可以从test.txt中直接取
-    rootpath = "/home/Signboard/second/datasets/train/"
-    filepaths = ["3801213fb80e7bec63750acd232eb9389b506b6a.jpg", "3801213fb80e7bec451d52cb252eb9389a506bd0.jpg"]
+    rootpath = "/home/Signboard/second/datasets/test/"
 
-    res = classify_main(rootpath, filepaths, all_image_bboxes)
-    print(res)
-    # [('3801213fb80e7bec63750acd232eb9389b506b6a.jpg', '19', 0.99979323), ('3801213fb80e7bec63750acd232eb9389b506b6a.jpg', '19', 0.6446284), ('3801213fb80e7bec451d52cb252eb9389a506bd0.jpg', '6', 0.9995425), ('3801213fb80e7bec451d52cb252eb9389a506bd0.jpg', '6', 0.99896395)]
+    temp_res_file = "merge.txt"
+    handle_csv = pd.read_csv(temp_res_file, sep=' ', names=['filepath', "label", 'score', 'xmin', 'ymin', 'xmax', 'ymax'],
+        dtype={"filepath":"str"})
+    all_image_bboxes = handle_csv.loc[:,['xmin', 'ymin', 'xmax', 'ymax']].values
+    classify_main(rootpath, handle_csv['filepath'].tolist(), all_image_bboxes)
+    res_csv = pd.read_csv("temp.txt", sep=' ', names=['filepath', "label", 'score'], dtype={"filepath":"str", "label":"str", "score":"str"})
+    handle_csv['label'] = res_csv['label']
+    handle_csv['score'] = res_csv['score']
+
+    handle_csv['xmin'] = handle_csv['xmin'].map(lambda x:str(int(round(x))) )
+    handle_csv['ymin'] = handle_csv['ymin'].map(lambda x:str(int(round(x))) )
+    handle_csv['xmax'] = handle_csv['xmax'].map(lambda x:str(int(round(x))) )
+    handle_csv['ymax'] = handle_csv['ymax'].map(lambda x:str(int(round(x))) )
+    handle_csv = handle_csv.loc[ handle_csv['label'] != '0', : ]
+    handle_csv.to_csv("result.csv", sep=' ', header=False, index=False)
