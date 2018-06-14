@@ -57,10 +57,10 @@ if __name__ == '__main__':
     train_datagen = ImageDataGenerator(
         shear_range=0.2,
         zoom_range=0.3,
-        rotation_range=20,
+        rotation_range=30,
         # channel_shift_range=20,
-        width_shift_range=0.1,
-        height_shift_range=0.1,
+        width_shift_range=0.2,
+        height_shift_range=0.2,
         # horizontal_flip=True,
         # vertical_flip=True,
         fill_mode="constant",
