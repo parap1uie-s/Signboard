@@ -1,5 +1,5 @@
 from Model import *
-from Losses import categorical_crossentropy_with_smooth
+from Losses import *
 from keras.optimizers import *
 from keras.callbacks import EarlyStopping,ModelCheckpoint,ReduceLROnPlateau
 from keras.preprocessing.image import ImageDataGenerator
@@ -17,8 +17,8 @@ if __name__ == '__main__':
     assert args.modelType in ["densenet", "InceptionResNetV2", "Resnet", "xception", "inception", "nas"]
     assert args.channel.isdigit()
     # categorical_crossentropy or with smooth
-    assert args.loss in ['cc', 'ccs']
-    if args.loss == "cc":
+    assert args.loss in ['cc', 'ccs', 'focal']
+    if args.loss == "cc" or args.loss == "focal":
         activation='softmax'
     else:
         activation='linear'
@@ -44,8 +44,10 @@ if __name__ == '__main__':
 
     if args.loss == "cc":
         model.compile(optimizer=optimizer, loss="categorical_crossentropy", metrics=['acc'])
-    else:
+    elif args.loss == "ccs":
         model.compile(optimizer=optimizer, loss=categorical_crossentropy_with_smooth, metrics=['acc'])
+    elif args.loss == "focal":
+        model.compile(optimizer=optimizer, loss=focal_loss, metrics=['acc'])
 
     if os.path.exists("Transfer-{}.h5".format(args.modelType)):
         model.load_weights("Transfer-{}.h5".format(args.modelType), by_name=True, skip_mismatch=True)
@@ -72,7 +74,7 @@ if __name__ == '__main__':
     train_generator = train_datagen.flow_from_directory(
             os.path.join(datapath, "train"),
             target_size=(height, width),
-            batch_size=4,
+            batch_size=6,
             class_mode='categorical',
             shuffle = True)
 
