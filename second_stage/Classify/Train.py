@@ -27,7 +27,7 @@ if __name__ == '__main__':
 
     datapath = "/home/Signboard/second/croped_dataset"
     width = 224
-    height = 224
+    height = 112
     
     if args.modelType == "densenet":
         model = DenseNetTransfer((height,width,3), channel=args.channel, final_activation=activation)
@@ -74,7 +74,7 @@ if __name__ == '__main__':
     train_generator = train_datagen.flow_from_directory(
             os.path.join(datapath, "train"),
             target_size=(height, width),
-            batch_size=6,
+            batch_size=12,
             class_mode='categorical',
             shuffle = True)
 
