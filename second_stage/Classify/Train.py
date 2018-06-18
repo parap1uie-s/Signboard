@@ -27,7 +27,7 @@ if __name__ == '__main__':
 
     datapath = "/home/Signboard/second/croped_dataset"
     width = 224
-    height = 112
+    height = 224
     
     if args.modelType == "densenet":
         model = DenseNetTransfer((height,width,3), channel=args.channel, final_activation=activation)
@@ -60,9 +60,9 @@ if __name__ == '__main__':
         shear_range=0.2,
         zoom_range=0.3,
         rotation_range=30,
-        # channel_shift_range=20,
-        width_shift_range=0.2,
-        height_shift_range=0.2,
+        channel_shift_range=10,
+        width_shift_range=0.3,
+        height_shift_range=0.3,
         # horizontal_flip=True,
         # vertical_flip=True,
         fill_mode="constant",
@@ -74,7 +74,7 @@ if __name__ == '__main__':
     train_generator = train_datagen.flow_from_directory(
             os.path.join(datapath, "train"),
             target_size=(height, width),
-            batch_size=12,
+            batch_size=4,
             class_mode='categorical',
             shuffle = True)
 
