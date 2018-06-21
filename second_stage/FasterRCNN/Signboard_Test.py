@@ -119,6 +119,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     model = RFCN_Model(mode="inference", config=config,
-                      model_dir=os.path.join(ROOT_DIR, "logs") )
+                      model_dir=os.path.join(ROOT_DIR, "logs"),architecture='resnet101')
 
     Test(model, args.loadpath, args.savepath)

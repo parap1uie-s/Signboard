@@ -56,7 +56,7 @@ class RFCNNConfig(Config):
     # use small validation steps since the epoch is small
     VALIDATION_STEPS = 200
 
-    RPN_NMS_THRESHOLD = 0.7
+    RPN_NMS_THRESHOLD = 0.6
 
 ############################################################
 #  Dataset
@@ -107,12 +107,11 @@ if __name__ == '__main__':
     dataset_val.initDB("val")
     dataset_val.prepare()
 
-    model = RFCN_Model(mode="training", config=config, model_dir=os.path.join(ROOT_DIR, "logs") )
+    model = RFCN_Model(mode="training", config=config, model_dir=os.path.join(ROOT_DIR, "logs"),architecture='resnet101' )
     # This is a hack, bacause the pre-train weights are not fit with dilated ResNet
     # model.keras_model.load_weights("/home/professorsfx/.keras/models/resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5", 
     #     by_name=True, skip_mismatch=True)
-    model.keras_model.load_weights(COCO_MODEL_PATH, by_name=True, skip_mismatch=True)
-
+    # model.keras_model.load_weights(COCO_MODEL_PATH, by_name=True, skip_mismatch=True)
     try:
         model_path = model.find_last()[1]
         if model_path is not None:
@@ -127,7 +126,7 @@ if __name__ == '__main__':
     print("Training network heads")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=40,
+                epochs=10,
                 layers='heads')
 
     # Training - Stage 2
@@ -135,13 +134,13 @@ if __name__ == '__main__':
     print("Fine tune Resnet stage 4 and up")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=120,
+                epochs=20,
                 layers='4+')
 
     # Training - Stage 3
     # Fine tune all layers
     print("Fine tune all layers")
     model.train(dataset_train, dataset_val,
-                learning_rate=config.LEARNING_RATE / 10,
+                learning_rate=config.LEARNING_RATE,
                 epochs=160,
                 layers='all')

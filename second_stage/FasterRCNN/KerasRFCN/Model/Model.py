@@ -26,17 +26,19 @@ import keras.models as KM
 
 class RFCN_Model(BaseModel):
     """docstring for RFCN_Model"""
-    def __init__(self, mode, config, model_dir):
+    def __init__(self, mode, config, model_dir, architecture='resnet101'):
         """
         mode: Either "training" or "inference"
         config: A Sub-class of the Config class
         model_dir: Directory to save training logs and trained weights
         """
         assert mode in ['training', 'inference']
+        assert architecture in ['resnet50', 'resnet101', 'resnet50_dilated', 'resnet101_dilated']
         self.mode = mode
         self.config = config
         self.model_dir = model_dir
         self.set_log_dir()
+        self.architecture = architecture
         self.keras_model = self.build(mode=mode, config=config)
 
     def build(self, mode, config):
@@ -70,8 +72,10 @@ class RFCN_Model(BaseModel):
             h, w = K.shape(input_image)[1], K.shape(input_image)[2]
             image_scale = K.cast(K.stack([h, w, h, w], axis=0), tf.float32)
             gt_boxes = KL.Lambda(lambda x: x / image_scale)(input_gt_boxes)
-
-        P2, P3, P4, P5, P6 = ResNet(input_image, architecture='resnet101').output_layers
+        if self.architecture in ['resnet50', 'resnet101']:
+            P2, P3, P4, P5, P6 = ResNet(input_image, architecture=self.architecture).output_layers
+        else:
+            P2, P3, P4, P5, P6 = ResNet_dilated(input_image, architecture=self.architecture).output_layers
 
         # Note that P6 is used in RPN, but not in the classifier heads.
         rpn_feature_maps = [P2, P3, P4, P5, P6]
@@ -904,4 +908,4 @@ class BatchNorm(KL.BatchNormalization):
     """
 
     def call(self, inputs, training=None):
-        return super(self.__class__, self).call(inputs, training=False)
+        return super(self.__class__, self).call(inputs, training=True)
