@@ -184,7 +184,7 @@ def create_callbacks(model, training_model, prediction_model, validation_generat
         callbacks.append(checkpoint)
 
     callbacks.append(keras.callbacks.ReduceLROnPlateau(
-        monitor  = 'loss',
+        monitor  = 'val_loss',
         factor   = 0.1,
         patience = 2,
         verbose  = 1,
@@ -211,8 +211,8 @@ def create_generators(args):
             max_shear=0.1,
             min_scaling=(0.9, 0.9),
             max_scaling=(1.1, 1.1),
-            flip_x_chance=0.5,
-            flip_y_chance=0.5,
+            flip_x_chance=0,
+            flip_y_chance=0,
         )
     else:
         transform_generator = random_transform_generator(flip_x_chance=0.5)
@@ -402,7 +402,7 @@ def parse_args(args):
     parser.add_argument('--no-snapshots',    help='Disable saving snapshots.', dest='snapshots', action='store_false')
     parser.add_argument('--no-evaluation',   help='Disable per epoch evaluation.', dest='evaluation', action='store_false')
     parser.add_argument('--freeze-backbone', help='Freeze training of backbone layers.', action='store_true')
-    parser.add_argument('--random-transform', help='Randomly transform image and annotations.', action='store_true')
+    parser.add_argument('--random-transform', help='Randomly transform image and annotations.', action='store_true', default=True)
     parser.add_argument('--image-min-side', help='Rescale the image so the smallest side is min_side.', type=int, default=800)
     parser.add_argument('--image-max-side', help='Rescale the image if the largest side is larger than max_side.', type=int, default=1333)
 
@@ -466,6 +466,7 @@ def main(args=None):
         training_model,
         prediction_model,
         validation_generator,
+        # None,
         args,
     )
 
@@ -476,6 +477,8 @@ def main(args=None):
         epochs=args.epochs,
         verbose=1,
         callbacks=callbacks,
+        # validation_data=validation_generator,
+        # validation_steps=2695//args.batch_size
     )
 
 

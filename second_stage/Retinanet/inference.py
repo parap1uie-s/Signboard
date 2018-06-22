@@ -1,15 +1,3 @@
-"""
-Keras RFCN
-Copyright (c) 2018
-Licensed under the MIT License (see LICENSE for details)
-Written by parap1uie-s@github.com
-"""
-
-'''
-This is a demo to Eval a RFCN model with DeepFashion Dataset
-http://mmlab.ie.cuhk.edu.hk/projects/DeepFashion.html
-'''
-
 import os
 import numpy as np
 import argparse
@@ -20,7 +8,7 @@ from keras_retinanet.utils.image import read_image_bgr, preprocess_image, resize
 from keras_retinanet.utils.visualization import draw_box, draw_caption
 from keras_retinanet.utils.colors import label_color
 import cv2
-import pickle
+from boxes_filter import boxes_filter
 
 def Test(model, loadpath, savepath):
     assert not loadpath == savepath, "loadpath should'n same with savepath"
@@ -53,12 +41,14 @@ def TestSinglePic(model, image, savepath, imgname):
 
     # visualize detections
     flag = False
-    prev_label = -1
-    for box, score, label in zip(boxes[0], scores[0], labels[0]):
+    boxes, scores, labels = boxes_filter(boxes[0], scores[0], labels[0])
+    # boxes, scores, labels = boxes[0], scores[0], labels[0]
+    for box, score, label in zip(boxes, scores, labels):
         # scores are sorted so we can break
-        if flag and score < 0.5 and prev_label != label:
-            break
+        if flag and score < 0.3:
+            continue
         flag = True
+        label = label.astype(int)
         color = label_color(label)
         
         b = box.astype(int)
@@ -66,7 +56,6 @@ def TestSinglePic(model, image, savepath, imgname):
         
         caption = "{} {:.3f}".format(label+1, score)
         draw_caption(draw, b, caption)
-        prev_label = label
 
     plt.figure(figsize=(15, 15))
     plt.axis('off')
