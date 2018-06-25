@@ -118,8 +118,8 @@ def create_models(backbone_retinanet, num_classes, weights, multi_gpu=0, freeze_
             'regression'    : losses.smooth_l1(),
             'classification': losses.focal()
         },
-        # optimizer=keras.optimizers.adam(lr=1e-5, clipnorm=0.001)
-        optimizer=keras.optimizers.SGD(lr=1e-5, clipnorm=0.001, momentum=0.9)
+        optimizer=keras.optimizers.adam(lr=1e-5, clipnorm=0.001)
+        # optimizer=keras.optimizers.SGD(lr=1e-5, clipnorm=0.001, momentum=0.9)
     )
 
     return model, training_model, prediction_model
@@ -208,12 +208,12 @@ def create_generators(args):
             max_rotation=0.2,
             min_translation=(-0.1, -0.1),
             max_translation=(0.1, 0.1),
-            min_shear=-0.1,
-            max_shear=0.1,
+            min_shear=-0.2,
+            max_shear=0.2,
             min_scaling=(0.9, 0.9),
             max_scaling=(1.1, 1.1),
-            flip_x_chance=0.5,
-            flip_y_chance=0.5,
+            flip_x_chance=0,
+            flip_y_chance=0,
         )
     # else:
     #     transform_generator = random_transform_generator(flip_x_chance=0.5)
