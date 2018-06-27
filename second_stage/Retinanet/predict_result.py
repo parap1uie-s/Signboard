@@ -49,21 +49,21 @@ def TestSinglePic(model, image, imgname):
 
     # visualize detections
     flag = False
-    prev_label = -1
     ret = []
     for box, score, label in zip(boxes[0], scores[0], labels[0]):
+        if not flag:
+            top_label = label
         # scores are sorted so we can break
-        if flag and score < 0.5 and prev_label != label:
-            break
+        # if flag and score < 0.05 and top_label != label:
+        if top_label != label:
+            continue
         flag = True
         color = label_color(label)
-
-        prev_label = label
         ret.append((box.astype(int), score, label))
     return ret
 
 if __name__ == '__main__':
-    os.environ['CUDA_VISIBLE_DEVICES'] = 0
+    os.environ['CUDA_VISIBLE_DEVICES'] = "0"
     ROOT_DIR = os.getcwd()
     parser = argparse.ArgumentParser()
 

@@ -40,8 +40,8 @@ class RFCNNConfig(Config):
     NUM_CLASSES = C
     # Use small images for faster training. Set the limits of the small side
     # the large side, and that determines the image shape.
-    IMAGE_MIN_DIM = 640
-    IMAGE_MAX_DIM = 768
+    IMAGE_MIN_DIM = 768
+    IMAGE_MAX_DIM = 1024
 
     # Use smaller anchors because our image and objects are small
     RPN_ANCHOR_SCALES = (32, 64, 128, 256, 512)  # anchor side in pixels
@@ -54,9 +54,9 @@ class RFCNNConfig(Config):
     STEPS_PER_EPOCH = 1000
 
     # use small validation steps since the epoch is small
-    VALIDATION_STEPS = 200
+    VALIDATION_STEPS = 1000
 
-    RPN_NMS_THRESHOLD = 0.6
+    RPN_NMS_THRESHOLD = 0.7
 
 ############################################################
 #  Dataset
