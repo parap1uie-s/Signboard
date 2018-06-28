@@ -43,7 +43,7 @@ def TestSinglePic(model, image, imgname):
     draw = image.copy()
     draw = cv2.cvtColor(draw, cv2.COLOR_BGR2RGB)
     image = preprocess_image(image)
-    image, scale = resize_image(image)
+    image, scale = resize_image(image, min_side=800, max_side=1333)
     boxes, scores, labels = model.predict(np.expand_dims(image, axis=0))
     boxes /= scale
 
