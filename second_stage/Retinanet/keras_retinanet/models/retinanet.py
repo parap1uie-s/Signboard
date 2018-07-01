@@ -176,7 +176,7 @@ The default anchor parameters.
 AnchorParameters.default = AnchorParameters(
     sizes   = [32, 64, 128, 256, 512],
     strides = [8, 16, 32, 64, 128],
-    ratios  = np.array([0.5, 1, 2], keras.backend.floatx()),
+    ratios  = np.array([0.5, 1, 2.06, 2.49], keras.backend.floatx()),
     scales  = np.array([2 ** 0, 2 ** (1.0 / 3.0), 2 ** (2.0 / 3.0)], keras.backend.floatx()),
 )
 
@@ -258,7 +258,7 @@ def retinanet(
     inputs,
     backbone_layers,
     num_classes,
-    num_anchors             = 9,
+    num_anchors             = 12,
     create_pyramid_features = __create_pyramid_features,
     submodels               = None,
     name                    = 'retinanet'
@@ -300,10 +300,11 @@ def retinanet(
 
 
 def retinanet_bbox(
-    model             = None,
-    anchor_parameters = AnchorParameters.default,
-    nms               = True,
-    name              = 'retinanet-bbox',
+    model                 = None,
+    anchor_parameters     = AnchorParameters.default,
+    nms                   = True,
+    class_specific_filter = True,
+    name                  = 'retinanet-bbox',
     **kwargs
 ):
     """ Construct a RetinaNet model on top of a backbone and adds convenience functions to output boxes directly.
@@ -312,10 +313,12 @@ def retinanet_bbox(
     These layers include applying the regression values to the anchors and performing NMS.
 
     Args
-        model             : RetinaNet model to append bbox layers to. If None, it will create a RetinaNet model using **kwargs.
-        anchor_parameters : Struct containing configuration for anchor generation (sizes, strides, ratios, scales).
-        name              : Name of the model.
-        *kwargs           : Additional kwargs to pass to the minimal retinanet model.
+        model                 : RetinaNet model to append bbox layers to. If None, it will create a RetinaNet model using **kwargs.
+        anchor_parameters     : Struct containing configuration for anchor generation (sizes, strides, ratios, scales).
+        nms                   : Whether to use non-maximum suppression for the filtering step.
+        class_specific_filter : Whether to use class specific filtering or filter for the best scoring class only.
+        name                  : Name of the model.
+        *kwargs               : Additional kwargs to pass to the minimal retinanet model.
 
     Returns
         A keras.models.Model which takes an image as input and outputs the detections on the image.
@@ -346,7 +349,11 @@ def retinanet_bbox(
     boxes = layers.ClipBoxes(name='clipped_boxes')([model.inputs[0], boxes])
 
     # filter detections (apply NMS / score threshold / select top-k)
-    detections = layers.FilterDetections(nms=nms, name='filtered_detections')([boxes, classification] + other)
+    detections = layers.FilterDetections(
+        nms                   = nms,
+        class_specific_filter = class_specific_filter,
+        name                  = 'filtered_detections'
+    )([boxes, classification] + other)
 
     outputs = detections
 

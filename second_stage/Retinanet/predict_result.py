@@ -43,7 +43,7 @@ def TestSinglePic(model, image, imgname):
     draw = image.copy()
     draw = cv2.cvtColor(draw, cv2.COLOR_BGR2RGB)
     image = preprocess_image(image)
-    image, scale = resize_image(image, min_side=800, max_side=1333)
+    image, scale = resize_image(image, min_side=960, max_side=1280)
     boxes, scores, labels = model.predict(np.expand_dims(image, axis=0))
     boxes /= scale
 
@@ -53,17 +53,29 @@ def TestSinglePic(model, image, imgname):
     for box, score, label in zip(boxes[0], scores[0], labels[0]):
         if not flag:
             top_label = label
+            flag = True
         # scores are sorted so we can break
         # if flag and score < 0.05 and top_label != label:
         if top_label != label:
             continue
-        flag = True
         color = label_color(label)
         ret.append((box.astype(int), score, label))
     return ret
 
+def model_with_weights(model, weights, skip_mismatch):
+    """ Load weights for model.
+
+    Args
+        model         : The model to load weights for.
+        weights       : The weights to load.
+        skip_mismatch : If True, skips layers whose shape of weights doesn't match with the model.
+    """
+    if weights is not None:
+        model.load_weights(weights, by_name=True, skip_mismatch=skip_mismatch)
+    return model
+
 if __name__ == '__main__':
-    os.environ['CUDA_VISIBLE_DEVICES'] = "0"
+    os.environ['CUDA_VISIBLE_DEVICES'] = "1"
     ROOT_DIR = os.getcwd()
     parser = argparse.ArgumentParser()
 
@@ -73,5 +85,5 @@ if __name__ == '__main__':
                 help="evaluate images loadpath")
 
     args = parser.parse_args()
-    model = load_model('model.h5', backbone_name='resnet50')
+    model = load_model('model.h5', backbone_name='resnet152')
     Test(model, args.loadpath)
