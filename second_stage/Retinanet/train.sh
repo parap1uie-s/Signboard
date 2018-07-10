@@ -13,4 +13,4 @@ sudo python3 keras_retinanet/bin/train.py --backbone=resnet101 --weights=snapsho
 sudo python3 keras_retinanet/bin/train.py --weights=resnet50_coco_best_v2.1.0.h5 --multi-gpu=2 --multi-gpu-force --batch-size=4 --steps=2000 csv train_annotations.csv classes.csv --val-annotations=val_annotations.csv
 
 
-python3 keras_retinanet/bin/train.py --backbone=resnet101 --weights=backup_weights/resnet101_csv_15.h5 --multi-gpu=2 --multi-gpu-force --batch-size=8 --steps=2000 csv train_annotations.csv classes.csv --val-annotations=val_annotations.csv
+sudo python3 keras_retinanet/bin/train.py --backbone=resnet101 --weights=snapshots/resnet101_csv_14.h5 --multi-gpu=2 --multi-gpu-force --batch-size=8 --steps=2000 csv train_annotations.csv classes.csv --val-annotations=val_annotations.csv

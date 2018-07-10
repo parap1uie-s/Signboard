@@ -101,7 +101,7 @@ def create_models(backbone_retinanet, num_classes, weights, multi_gpu=0, freeze_
     # optionally wrap in a parallel model
     if multi_gpu > 1:
         from keras.utils import multi_gpu_model
-        with tf.device('/gpu:2'):
+        with tf.device('/gpu:0'):
             model = model_with_weights(backbone_retinanet(num_classes, modifier=modifier), weights=weights, skip_mismatch=True)
         training_model = multi_gpu_model(model, gpus=multi_gpu)
     else:
@@ -183,12 +183,12 @@ def create_callbacks(model, training_model, prediction_model, validation_generat
         callbacks.append(checkpoint)
 
     callbacks.append(keras.callbacks.ReduceLROnPlateau(
-        monitor  = 'loss',
+        monitor  = 'mAP',
         factor   = 0.1,
         patience = 2,
         verbose  = 1,
         mode     = 'auto',
-        epsilon  = 0.0001,
+        min_delta  = 0.0001,
         cooldown = 0,
         min_lr   = 0
     ))
@@ -393,8 +393,8 @@ def parse_args(args):
     parser.add_argument('--no-evaluation',   help='Disable per epoch evaluation.', dest='evaluation', action='store_false')
     parser.add_argument('--freeze-backbone', help='Freeze training of backbone layers.', action='store_true')
     parser.add_argument('--random-transform', help='Randomly transform image and annotations.', action='store_true')
-    parser.add_argument('--image-min-side', help='Rescale the image so the smallest side is min_side.', type=int, default=800)
-    parser.add_argument('--image-max-side', help='Rescale the image if the largest side is larger than max_side.', type=int, default=800)
+    parser.add_argument('--image-min-side', help='Rescale the image so the smallest side is min_side.', type=int, default=450)
+    parser.add_argument('--image-max-side', help='Rescale the image if the largest side is larger than max_side.', type=int, default=600)
 
     return check_args(parser.parse_args(args))
 
