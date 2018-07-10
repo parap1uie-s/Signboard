@@ -53,11 +53,11 @@ def TestSinglePic(model, image, imgname):
     for box, score, label in zip(boxes[0], scores[0], labels[0]):
         if not flag:
             top_label = label
-            flag = True
         # scores are sorted so we can break
         # if flag and score < 0.05 and top_label != label:
         if top_label != label:
             continue
+        flag = True
         color = label_color(label)
         ret.append((box.astype(int), score, label))
     return ret

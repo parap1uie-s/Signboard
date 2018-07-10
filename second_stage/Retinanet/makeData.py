@@ -7,8 +7,8 @@ if __name__ == '__main__':
 	# datapath = "/home/Signboard/second/datasets/train/"
 	# train_txt = pd.read_csv( "/home/Signboard/second/datasets/train.txt", sep=' ', names=['filepath', "label", 'xmin', 'ymin', 'xmax', 'ymax'])
 
-	datapath = "/home/ubuntu/fusai/datasets/train/"
-	train_txt = pd.read_csv( "/home/ubuntu/fusai/datasets/train.txt", sep=' ', names=['filepath', "label", 'xmin', 'ymin', 'xmax', 'ymax'])
+	datapath = "/home/houjun/projects/Retinanet/datasets/train/"
+	train_txt = pd.read_csv( "/home/houjun/projects/Retinanet/datasets/train.txt", sep=' ', names=['filepath', "label", 'xmin', 'ymin', 'xmax', 'ymax'])
 
 	all_images = train_txt['filepath'].value_counts().reset_index()
 	all_images.columns = ["filepath", 'counts']
@@ -27,8 +27,8 @@ if __name__ == '__main__':
 	train.to_csv("train_annotations.csv", columns=['filepath', 'xmin', 'ymin', 'xmax', 'ymax', "label_x"], header=False, index=False)
 	val.to_csv("val_annotations.csv", columns=['filepath', 'xmin', 'ymin', 'xmax', 'ymax', "label_x"], header=False, index=False)
 
-	# f = open("classes.csv", "w+")
-	# # class_name,id
-	# for i in range(60):
-	# 	f.write("{},{}\n".format(i+1,i))
-	# f.close()
+	f = open("classes.csv", "w+")
+	# class_name,id
+	for i in range(60):
+		f.write("{},{}\n".format(i+1,i))
+	f.close()
