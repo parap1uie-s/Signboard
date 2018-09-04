@@ -10,7 +10,7 @@ from keras.applications.xception import Xception
 from keras.applications.inception_v3 import InceptionV3
 from keras.applications.nasnet import NASNetMobile
 
-def NASTransfer(input_shape, channel=3):
+def NASTransfer(input_shape, channel=3, final_activation='softmax'):
     input_tensor = KL.Input((input_shape))
     if channel == 3:
         baseModel = NASNetMobile(include_top=False, weights="imagenet", input_tensor=input_tensor, pooling="avg")
@@ -18,15 +18,22 @@ def NASTransfer(input_shape, channel=3):
         gray_tensor = RGB2GrayLayer()(input_tensor) # 224,224,1
         x = KL.Concatenate(axis=-1)([input_tensor, gray_tensor]) # 224,224,4
         baseModel = NASNetMobile(include_top=False, weights=None, input_tensor=x, pooling="avg")
+    elif channel == 5:
+        gray_tensor = RGB2GrayLayer()(input_tensor) # 224,224,1
+        sobel_tensor = Gray2SobelEdgeLayer()(gray_tensor) # 224,224,1
+        sobel_tensor = KL.Conv2D(64,(14,14), padding="same", name="sobelCONV")(sobel_tensor)
+        x = KL.Concatenate(axis=-1)([input_tensor, gray_tensor, sobel_tensor]) # 224,224,4+64
+        x = ChannelVoteBlock(x)
+        baseModel = NASNetMobile(include_top=False, weights=None, input_tensor=x, pooling="avg")
 
     x = baseModel.output
     x = KL.Dense(1024, activation='relu')(x)
     x = KL.Dropout(0.3)(x)
-    x = KL.Dense(100, activation='softmax', name='output')(x)
+    x = KL.Dense(100, activation=final_activation, name='output')(x)
     model = Model(input_tensor, outputs=x)
     return model
 
-def InceptionTransfer(input_shape, channel=3):
+def InceptionTransfer(input_shape, channel=3, final_activation='softmax'):
     input_tensor = KL.Input((input_shape))
     if channel == 3:
         baseModel = InceptionV3(include_top=False, weights="imagenet", input_tensor=input_tensor, pooling="avg")
@@ -34,15 +41,22 @@ def InceptionTransfer(input_shape, channel=3):
         gray_tensor = RGB2GrayLayer()(input_tensor) # 224,224,1
         x = KL.Concatenate(axis=-1)([input_tensor, gray_tensor]) # 224,224,4
         baseModel = InceptionV3(include_top=False, weights=None, input_tensor=x, pooling="avg")
+    elif channel == 5:
+        gray_tensor = RGB2GrayLayer()(input_tensor) # 224,224,1
+        sobel_tensor = Gray2SobelEdgeLayer()(gray_tensor) # 224,224,1
+        sobel_tensor = KL.Conv2D(64,(14,14), padding="same", name="sobelCONV")(sobel_tensor)
+        x = KL.Concatenate(axis=-1)([input_tensor, gray_tensor, sobel_tensor]) # 224,224,4+64
+        x = ChannelVoteBlock(x)
+        baseModel = InceptionV3(include_top=False, weights=None, input_tensor=x, pooling="avg")
 
     x = baseModel.output
     x = KL.Dense(1024, activation='relu')(x)
     x = KL.Dropout(0.3)(x)
-    x = KL.Dense(100, activation='softmax', name='output')(x)
+    x = KL.Dense(100, activation=final_activation, name='output')(x)
     model = Model(input_tensor, outputs=x)
     return model
 
-def Transfer(input_shape, channel=3):
+def Transfer(input_shape, channel=3, final_activation='softmax'):
     input_tensor = KL.Input((input_shape))
     if channel == 3:
         baseModel = InceptionResNetV2(include_top=False, weights="imagenet", input_tensor=input_tensor, pooling="avg")
@@ -50,15 +64,22 @@ def Transfer(input_shape, channel=3):
         gray_tensor = RGB2GrayLayer()(input_tensor) # 224,224,1
         x = KL.Concatenate(axis=-1)([input_tensor, gray_tensor]) # 224,224,4
         baseModel = InceptionResNetV2(include_top=False, weights=None, input_tensor=x, pooling="avg")
+    elif channel == 5:
+        gray_tensor = RGB2GrayLayer()(input_tensor) # 224,224,1
+        sobel_tensor = Gray2SobelEdgeLayer()(gray_tensor) # 224,224,1
+        sobel_tensor = KL.Conv2D(64,(14,14), padding="same", name="sobelCONV")(sobel_tensor)
+        x = KL.Concatenate(axis=-1)([input_tensor, gray_tensor, sobel_tensor]) # 224,224,4+64
+        x = ChannelVoteBlock(x)
+        baseModel = InceptionResNetV2(include_top=False, weights=None, input_tensor=x, pooling="avg")
 
     x = baseModel.output
     x = KL.Dense(1024, activation='relu')(x)
     x = KL.Dropout(0.3)(x)
-    x = KL.Dense(100, activation='softmax', name='output')(x)
+    x = KL.Dense(100, activation=final_activation, name='output')(x)
     model = Model(input_tensor, outputs=x)
     return model
 
-def XceptionTransfer(input_shape, channel=3):
+def XceptionTransfer(input_shape, channel=3, final_activation='softmax'):
     input_tensor = KL.Input((input_shape))
     if channel == 3:
         baseModel = Xception(include_top=False, weights="imagenet", input_tensor=input_tensor, pooling="avg")
@@ -66,15 +87,23 @@ def XceptionTransfer(input_shape, channel=3):
         gray_tensor = RGB2GrayLayer()(input_tensor) # 224,224,1
         x = KL.Concatenate(axis=-1)([input_tensor, gray_tensor]) # 224,224,4
         baseModel = Xception(include_top=False, weights=None, input_tensor=x, pooling="avg")
+    elif channel == 5:
+        gray_tensor = RGB2GrayLayer()(input_tensor) # 224,224,1
+        sobel_tensor = Gray2SobelEdgeLayer()(gray_tensor) # 224,224,1
+        sobel_tensor = KL.Conv2D(64,(14,14), padding="same", name="sobelCONV")(sobel_tensor)
+        x = KL.Concatenate(axis=-1)([input_tensor, gray_tensor, sobel_tensor]) # 224,224,4+64
+        x = ChannelVoteBlock(x)
+        baseModel = Xception(include_top=False, weights=None, input_tensor=x, pooling="avg")
 
     x = baseModel.output
     x = KL.Dense(1024, activation='relu')(x)
     x = KL.Dropout(0.3)(x)
-    x = KL.Dense(100, activation='softmax', name='output')(x)
+    x = KL.Dense(100, activation=final_activation, name='output')(x)
     model = Model(input_tensor, outputs=x)
     return model
 
-def DenseNetTransfer(input_shape, channel=3):
+def DenseNetTransfer(input_shape, channel=3, final_activation='softmax'):
+    assert final_activation in ['softmax', 'linear']
     input_tensor = KL.Input((input_shape))
     if channel == 3:
         baseModel = DenseNet201(include_top=False, weights="imagenet", input_tensor=input_tensor, pooling="avg")
@@ -82,11 +111,18 @@ def DenseNetTransfer(input_shape, channel=3):
         gray_tensor = RGB2GrayLayer()(input_tensor) # 224,224,1
         x = KL.Concatenate(axis=-1)([input_tensor, gray_tensor]) # 224,224,4
         baseModel = DenseNet201(include_top=False, weights=None, input_tensor=x, pooling="avg")
+    elif channel == 5:
+        gray_tensor = RGB2GrayLayer()(input_tensor) # 224,224,1
+        sobel_tensor = Gray2SobelEdgeLayer()(gray_tensor) # 224,224,1
+        sobel_tensor = KL.Conv2D(64,(14,14), padding="same", name="sobelCONV")(sobel_tensor)
+        x = KL.Concatenate(axis=-1)([input_tensor, gray_tensor, sobel_tensor]) # 224,224,4+64
+        x = ChannelVoteBlock(x)
+        baseModel = DenseNet201(include_top=False, weights=None, input_tensor=x, pooling="avg")
 
     x = baseModel.output
     x = KL.Dense(1024, activation='relu')(x)
     x = KL.Dropout(0.3)(x)
-    x = KL.Dense(100, activation='softmax', name='output')(x)
+    x = KL.Dense(100, activation=final_activation, name='output')(x)
     model = Model(input_tensor, outputs=x)
     return model
 
@@ -104,35 +140,35 @@ def ResNet(input_shape,architecture='resnet50', channel=3):
     x = BatchNorm(axis=3, name='bn_conv1')(x)
     x = KL.Activation('relu')(x)
     x = KL.MaxPooling2D((3, 3), strides=(2, 2), padding="same")(x)
-    # x = STN_block(x,1)
+    x = STN_block(x,1)
     # Stage 2
     x = conv_block(x, 3, [64, 64, 256], stage=2, block='a', strides=(1, 1))
     x = identity_block(x, 3, [64, 64, 256], stage=2, block='b')
     x = identity_block(x, 3, [64, 64, 256], stage=2, block='c')
-    # x = STN_block(x,2)
+    x = STN_block(x,2)
     # Stage 3
     x = conv_block(x, 3, [128, 128, 512], stage=3, block='a')
     x = identity_block(x, 3, [128, 128, 512], stage=3, block='b')
     x = identity_block(x, 3, [128, 128, 512], stage=3, block='c')
     x = identity_block(x, 3, [128, 128, 512], stage=3, block='d')
-    # x = STN_block(x,3)
+    x = STN_block(x,3)
     # Stage 4
     x = conv_block(x, 3, [256, 256, 1024], stage=4, block='a')
     block_count = {"resnet50": 5, "resnet101": 22}[architecture]
     for i in range(block_count):
         x = identity_block(x, 3, [256, 256, 1024], stage=4, block=chr(98 + i))
-    # x = STN_block(x,4)
+    x = STN_block(x,4)
     # Stage 5
     x = conv_block(x, 3, [256, 256, 256], stage=5, block='a', strides=(1, 1))
     x = identity_block(x, 3, [256, 256, 256], stage=5, block='b')
     x = identity_block(x, 3, [256, 256, 256], stage=5, block='c')
-    # x = STN_block(x,5)
+    x = STN_block(x,5)
 
     # Final
     x = KL.GlobalAveragePooling2D()(x)
     x = KL.Dense(1024, activation='relu')(x)
     x = KL.Dropout(0.3)(x)
-    x = KL.Dense(100, activation='softmax', name='output')(x)
+    x = KL.Dense(100, activation=final_activation, name='output')(x)
     model = Model(input_tensor, outputs=x)
     return model
 
@@ -256,3 +292,33 @@ class RGB2GrayLayer(Layer):
 
     def compute_output_shape(self, input_shape):
         return (input_shape[0], input_shape[1], input_shape[2], 1)
+
+class Gray2SobelEdgeLayer(Layer):
+    """docstring for Gray2SobelEdgeLayer"""
+    def __init__(self, **kwargs):
+        super(Gray2SobelEdgeLayer, self).__init__(**kwargs)
+
+    def call(self, grayImg):
+        w = tf.image.sobel_edges(grayImg)
+        res = tf.sqrt( tf.pow(w[...,0,0], 2) + tf.pow(w[...,0,1], 2) )
+
+        # min_by_batch = tf.expand_dims(tf.expand_dims(tf.reduce_min(tf.reduce_min(res, axis=1),axis=1), axis=-1),axis=-1)
+        # max_by_batch = tf.expand_dims(tf.expand_dims(tf.reduce_max(tf.reduce_max(res, axis=1),axis=1), axis=-1),axis=-1)
+
+        # res = (res - min_by_batch) / (max_by_batch - min_by_batch)
+        res = tf.expand_dims(res, -1)
+        res = tf.sigmoid(res)
+        return res
+
+    def compute_output_shape(self, input_shape):
+        return (input_shape[0], input_shape[1], input_shape[2], 1)
+
+def ChannelVoteBlock(input_tensor):
+    filters = int(input_tensor.get_shape()[-1])
+    se_shape = (1, 1, filters)
+    x = KL.GlobalAveragePooling2D()(input_tensor)
+    x = KL.Reshape(se_shape)(x)
+    x = KL.Dense(filters, activation='relu',kernel_initializer='he_normal',use_bias=False, name='channel_vote_dense1')(x)
+    x = KL.Dense(filters, activation='sigmoid',kernel_initializer='he_normal',use_bias=False, name='channel_vote_dense2')(x)
+    x = KL.Multiply()([input_tensor, x])
+    return x

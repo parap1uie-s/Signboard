@@ -43,7 +43,7 @@ def TestSinglePic(model, image, imgname):
     draw = image.copy()
     draw = cv2.cvtColor(draw, cv2.COLOR_BGR2RGB)
     image = preprocess_image(image)
-    image, scale = resize_image(image, min_side=960, max_side=1280)
+    image, scale = resize_image(image, min_side=800, max_side=800)
     boxes, scores, labels = model.predict(np.expand_dims(image, axis=0))
     boxes /= scale
 
@@ -55,7 +55,9 @@ def TestSinglePic(model, image, imgname):
             top_label = label
         # scores are sorted so we can break
         # if flag and score < 0.05 and top_label != label:
-        if top_label != label:
+        # if top_label != label:
+        #     continue
+        if score < 0.05:
             continue
         flag = True
         color = label_color(label)
@@ -85,5 +87,5 @@ if __name__ == '__main__':
                 help="evaluate images loadpath")
 
     args = parser.parse_args()
-    model = load_model('model.h5', backbone_name='resnet152')
+    model = load_model('model.h5', backbone_name='resnet101')
     Test(model, args.loadpath)

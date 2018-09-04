@@ -117,7 +117,8 @@ def create_models(backbone_retinanet, num_classes, weights, multi_gpu=0, freeze_
             'regression'    : losses.smooth_l1(),
             'classification': losses.focal()
         },
-        optimizer=keras.optimizers.adam(lr=1e-5, clipnorm=0.001)
+        optimizer=keras.optimizers.adam(lr=1e-4, clipnorm=0.01)
+        # optimizer=keras.optimizers.SGD(lr=0.005, clipnorm=0.01)
     )
 
     return model, training_model, prediction_model
@@ -176,22 +177,36 @@ def create_callbacks(model, training_model, prediction_model, validation_generat
             ),
             verbose=1,
             save_best_only=True,
-            monitor="mAP",
-            mode='max'
+            monitor="loss",
+            mode='min'
         )
         checkpoint = RedirectModel(checkpoint, model)
         callbacks.append(checkpoint)
 
-    callbacks.append(keras.callbacks.ReduceLROnPlateau(
-        monitor  = 'mAP',
-        factor   = 0.1,
-        patience = 2,
-        verbose  = 1,
-        mode     = 'auto',
-        min_delta  = 0.0001,
-        cooldown = 0,
-        min_lr   = 0
-    ))
+    # callbacks.append(keras.callbacks.ReduceLROnPlateau(
+    #     monitor  = 'mAP',
+    #     factor   = 0.1,
+    #     patience = 2,
+    #     verbose  = 1,
+    #     mode     = 'auto',
+    #     min_delta  = 0.0001,
+    #     cooldown = 0,
+    #     min_lr   = 0
+    # ))
+
+    def schedule(epoch):
+        initial_lrate = 1e-6
+        factor = 0.1
+
+        if epoch < 14:
+            lrate = initial_lrate
+        if epoch >= 14 and epoch <= 20:
+            lrate = initial_lrate * factor
+        if epoch > 20:
+            lrate = initial_lrate * factor * factor
+        return lrate
+
+    callbacks.append(keras.callbacks.LearningRateScheduler(schedule, verbose=1))
 
     return callbacks
 
@@ -217,10 +232,10 @@ def create_generators(args, preprocess_image):
             max_rotation=0.2,
             min_translation=(-0.2, -0.2),
             max_translation=(0.2, 0.2),
-            min_shear=-0.3,
-            max_shear=0.3,
-            min_scaling=(0.8, 0.8),
-            max_scaling=(1.2, 1.2),
+            min_shear=-0.2,
+            max_shear=0.2,
+            min_scaling=(0.9, 0.9),
+            max_scaling=(1.1, 1.1),
             flip_x_chance=0,
             flip_y_chance=0,
         )
@@ -393,8 +408,8 @@ def parse_args(args):
     parser.add_argument('--no-evaluation',   help='Disable per epoch evaluation.', dest='evaluation', action='store_false')
     parser.add_argument('--freeze-backbone', help='Freeze training of backbone layers.', action='store_true')
     parser.add_argument('--random-transform', help='Randomly transform image and annotations.', action='store_true')
-    parser.add_argument('--image-min-side', help='Rescale the image so the smallest side is min_side.', type=int, default=450)
-    parser.add_argument('--image-max-side', help='Rescale the image if the largest side is larger than max_side.', type=int, default=600)
+    parser.add_argument('--image-min-side', help='Rescale the image so the smallest side is min_side.', type=int, default=768)
+    parser.add_argument('--image-max-side', help='Rescale the image if the largest side is larger than max_side.', type=int, default=1024)
 
     return check_args(parser.parse_args(args))
 

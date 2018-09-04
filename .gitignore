@@ -1,3 +1,5 @@
 *.h5
 *.pyc
+*.caffemodel
+second_stage/Release
 FeatureEngineering/test_groundtruth.csv
