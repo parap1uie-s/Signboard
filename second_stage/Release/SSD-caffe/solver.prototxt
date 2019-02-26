@@ -1,0 +1,23 @@
+train_net: "data/baidu/VGG_512/train.prototxt"
+base_lr: 0.001
+display: 10
+max_iter: 260000
+lr_policy: "multistep"
+gamma: 0.1
+momentum: 0.9
+weight_decay: 0.0005
+snapshot: 10000
+snapshot_prefix: "data/baidu/VGG_512/VGG_coco_SSD_512x512"
+solver_mode: GPU
+device_id: 0
+debug_info: false
+snapshot_after_train: true
+test_initialization: false
+average_loss: 10
+stepvalue: 120000
+stepvalue: 240000
+iter_size: 1
+type: "SGD"
+eval_type: "detection"
+ap_version: "11point"
+

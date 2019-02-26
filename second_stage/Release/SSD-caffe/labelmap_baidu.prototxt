@@ -1,0 +1,305 @@
+item {
+  name: "none_of_the_above"
+  label: 0
+  display_name: "background"
+}
+item {
+  name: "n1"
+  label: 1
+  display_name: "n1"
+}
+item {
+  name: "n2"
+  label: 2
+  display_name: "n2"
+}
+item {
+  name: "n3"
+  label: 3
+  display_name: "n3"
+}
+item {
+  name: "n4"
+  label: 4
+  display_name: "n4"
+}
+item {
+  name: "n5"
+  label: 5
+  display_name: "n5"
+}
+item {
+  name: "n6"
+  label: 6
+  display_name: "n6"
+}
+item {
+  name: "n7"
+  label: 7
+  display_name: "n7"
+}
+item {
+  name: "n8"
+  label: 8
+  display_name: "n8"
+}
+item {
+  name: "n9"
+  label: 9
+  display_name: "n9"
+}
+item {
+  name: "n10"
+  label: 10
+  display_name: "n10"
+}
+item {
+  name: "n11"
+  label: 11
+  display_name: "n11"
+}
+item {
+  name: "n12"
+  label: 12
+  display_name: "n12"
+}
+item {
+  name: "n13"
+  label: 13
+  display_name: "n13"
+}
+item {
+  name: "n14"
+  label: 14
+  display_name: "n14"
+}
+item {
+  name: "n15"
+  label: 15
+  display_name: "n15"
+}
+item {
+  name: "n16"
+  label: 16
+  display_name: "n16"
+}
+item {
+  name: "n17"
+  label: 17
+  display_name: "n17"
+}
+item {
+  name: "n18"
+  label: 18
+  display_name: "n18"
+}
+item {
+  name: "n19"
+  label: 19
+  display_name: "n19"
+}
+item {
+  name: "n20"
+  label: 20
+  display_name: "n20"
+}
+item {
+  name: "n21"
+  label: 21
+  display_name: "n21"
+}
+item {
+  name: "n22"
+  label: 22
+  display_name: "n22"
+}
+item {
+  name: "n23"
+  label: 23
+  display_name: "n23"
+}
+item {
+  name: "n24"
+  label: 24
+  display_name: "n24"
+}
+item {
+  name: "n25"
+  label: 25
+  display_name: "n25"
+}
+item {
+  name: "n26"
+  label: 26
+  display_name: "n26"
+}
+item {
+  name: "n27"
+  label: 27
+  display_name: "n27"
+}
+item {
+  name: "n28"
+  label: 28
+  display_name: "n28"
+}
+item {
+  name: "n29"
+  label: 29
+  display_name: "n29"
+}
+item {
+  name: "n30"
+  label: 30
+  display_name: "n30"
+}
+item {
+  name: "n31"
+  label: 31
+  display_name: "n31"
+}
+item {
+  name: "n32"
+  label: 32
+  display_name: "n32"
+}
+item {
+  name: "n33"
+  label: 33
+  display_name: "n33"
+}
+item {
+  name: "n34"
+  label: 34
+  display_name: "n34"
+}
+item {
+  name: "n35"
+  label: 35
+  display_name: "n35"
+}
+item {
+  name: "n36"
+  label: 36
+  display_name: "n36"
+}
+item {
+  name: "n37"
+  label: 37
+  display_name: "n37"
+}
+item {
+  name: "n38"
+  label: 38
+  display_name: "n38"
+}
+item {
+  name: "n39"
+  label: 39
+  display_name: "n39"
+}
+item {
+  name: "n40"
+  label: 40
+  display_name: "n40"
+}
+item {
+  name: "n41"
+  label: 41
+  display_name: "n41"
+}
+item {
+  name: "n42"
+  label: 42
+  display_name: "n42"
+}
+item {
+  name: "n43"
+  label: 43
+  display_name: "n43"
+}
+item {
+  name: "n44"
+  label: 44
+  display_name: "n44"
+}
+item {
+  name: "n45"
+  label: 45
+  display_name: "n45"
+}
+item {
+  name: "n46"
+  label: 46
+  display_name: "n46"
+}
+item {
+  name: "n47"
+  label: 47
+  display_name: "n47"
+}
+item {
+  name: "n48"
+  label: 48
+  display_name: "n48"
+}
+item {
+  name: "n49"
+  label: 49
+  display_name: "n49"
+}
+item {
+  name: "n50"
+  label: 50
+  display_name: "n50"
+}
+item {
+  name: "n51"
+  label: 51
+  display_name: "n51"
+}
+item {
+  name: "n52"
+  label: 52
+  display_name: "n52"
+}
+item {
+  name: "n53"
+  label: 53
+  display_name: "n53"
+}
+item {
+  name: "n54"
+  label: 54
+  display_name: "n54"
+}
+item {
+  name: "n55"
+  label: 55
+  display_name: "n55"
+}
+item {
+  name: "n56"
+  label: 56
+  display_name: "n56"
+}
+item {
+  name: "n57"
+  label: 57
+  display_name: "n57"
+}
+item {
+  name: "n58"
+  label: 58
+  display_name: "n58"
+}
+item {
+  name: "n59"
+  label: 59
+  display_name: "n59"
+}
+item {
+  name: "n60"
+  label: 60
+  display_name: "n60"
+}
